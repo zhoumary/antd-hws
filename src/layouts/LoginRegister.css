@@ -35,7 +35,7 @@ body {
 
 .content {
     width: 100%;
-    min-height: 350px;
+    min-height: 500px;
     margin: 25px auto;
     flex: 1;
     display: flex;

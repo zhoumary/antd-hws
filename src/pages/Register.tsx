@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Form, Input, Select, Checkbox, Button } from "antd";
 
@@ -9,9 +9,48 @@ const { Option } = Select;
 
 const Register = () => {
   const [form] = Form.useForm();
+  const [content, setContent] = useState({});
+  const [isRegister, setIsRegister] = useState(false);
 
-  const onFinish = () => {
-    console.log("Received values of form: ");
+  // how to get form content???
+  const getForm = (e: React.FormEvent<HTMLInputElement>) => {
+    const newValue = e.currentTarget.value;
+    setContent(newValue);
+  };
+
+  const onFinish = (event: {}) => {
+    toLogin(event);
+  };
+
+  const toLogin = (event: {}) => {
+    // call API to verify the Username and Password
+    callRegister();
+
+    if (isRegister) {
+      const login = "http://localhost:3000/";
+      window.location.href = login;
+    }
+  };
+
+  const callRegister = () => {
+    const registetContent = content;
+
+    // post name and key to API
+    fetch(`http://localhost:4000/weather`, {
+      method: "POST",
+      body: JSON.stringify(registetContent), // string or object
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    })
+      .then(response => response.json())
+      .then(response => {
+        // process the response
+
+        setIsRegister(true);
+      })
+      .catch(err => console.log(err));
   };
 
   const prefixSelector = (
@@ -143,6 +182,7 @@ const Register = () => {
                 type="primary"
                 htmlType="submit"
                 className="register-form-button"
+                onClick={toLogin}
               >
                 Register
               </Button>

@@ -90,7 +90,7 @@ const MenuLayout: React.FC<Props> = props => {
               title={
                 <span>
                   <UserOutlined />
-                  subnav 1
+                  <span>User</span>
                 </span>
               }
             >
@@ -104,7 +104,7 @@ const MenuLayout: React.FC<Props> = props => {
               title={
                 <span>
                   <LaptopOutlined />
-                  subnav 2
+                  <span>subnav 2</span>
                 </span>
               }
             >
@@ -118,7 +118,7 @@ const MenuLayout: React.FC<Props> = props => {
               title={
                 <span>
                   <NotificationOutlined />
-                  subnav 3
+                  <span>subnav 3</span>
                 </span>
               }
             >
