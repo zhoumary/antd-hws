@@ -1,0 +1,18 @@
+@import '~antd/dist/antd.css';
+.registerContent {
+    width: 368px;
+}
+
+.register-form {
+    width: 100%;
+}
+
+.register-form-button {
+    width: 40%;
+}
+
+.registerOrNot .ant-form-item-control-input-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

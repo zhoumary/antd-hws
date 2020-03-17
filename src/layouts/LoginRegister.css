@@ -1,0 +1,66 @@
+@import '~antd/dist/antd.css';
+html,
+body {
+    background-color: #f0f2f5;
+}
+
+.root {
+    /* display: block; */
+    position: relative;
+    min-height: 100vh;
+}
+
+.login {
+    height: 100vh;
+    min-height: 100vh;
+    padding-bottom: 2.5rem;
+    display: -webkit-flex;
+}
+
+.language {
+    background-color: #f0f2f5;
+}
+
+.langSetting {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+}
+
+.multiLang {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.content {
+    width: 100%;
+    min-height: 350px;
+    margin: 25px auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loginTitle {
+    width: 100%;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo {
+    height: 88px;
+    margin-right: 16px;
+    vertical-align: top;
+}
+
+.systemTitle {
+    top: 2px;
+    color: rgba(0, 0, 0, .85);
+    font-weight: 600;
+    font-size: 30px;
+    font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+}
