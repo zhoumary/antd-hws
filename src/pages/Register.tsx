@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+import axios from "axios";
+import qs from "qs";
+
 import { Form, Input, Select, Checkbox, Button } from "antd";
 
 import "./Register.css";
@@ -9,13 +12,33 @@ const { Option } = Select;
 
 const Register = () => {
   const [form] = Form.useForm();
-  const [content, setContent] = useState({});
+
+  const [data, setData] = useState({});
+  const [content, setContent] = useState({
+    email: "",
+    phone: "",
+    wechat: "",
+    password: "",
+    confirmPassword: ""
+  });
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [wechat, setWeChat] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [url, setUrl] = useState("http://hn.algolia.com/api/v1/register");
+  const [isError, setIsError] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
 
   // how to get form content???
-  const getForm = (e: React.FormEvent<HTMLInputElement>) => {
-    const newValue = e.currentTarget.value;
-    setContent(newValue);
+  const getForm = () => {
+    setContent({
+      email: email,
+      phone: phone,
+      wechat: wechat,
+      password: password,
+      confirmPassword: confirmPassword
+    });
   };
 
   const onFinish = (event: {}) => {
@@ -24,38 +47,58 @@ const Register = () => {
 
   const toLogin = (event: {}) => {
     // call API to verify the Username and Password
+    getForm();
     callRegister();
-
-    if (isRegister) {
-      const login = "http://localhost:3000/";
-      window.location.href = login;
-    }
   };
 
+  function isEmpty(obj: Object) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) return false;
+    }
+    return true;
+  }
+
   const callRegister = () => {
-    const registetContent = content;
+    setIsError(false);
+    let registerJudge: boolean = false;
 
-    // post name and key to API
-    fetch(`http://localhost:4000/weather`, {
+    axios({
       method: "POST",
-      body: JSON.stringify(registetContent), // string or object
+      baseURL: "",
+      url: "/register",
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      }
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      data: qs.stringify(content)
+      // data: qs.stringify(body),
     })
-      .then(response => response.json())
       .then(response => {
-        // process the response
-
-        setIsRegister(true);
+        const respData = response.data;
+        setData(respData);
+        if (isEmpty(respData) && isRegister === true) {
+          setIsRegister(false);
+          registerJudge = false;
+        } else if (!isEmpty(respData) && isRegister === false) {
+          setIsRegister(true);
+          registerJudge = true;
+        }
       })
-      .catch(err => console.log(err));
+      .then(() => {
+        // link to Welcome page
+        if (registerJudge) {
+          const login = "http://localhost:3000/";
+          window.location.href = login;
+        }
+      })
+      .catch(function(error) {
+        console.log(error.toJSON());
+      });
   };
 
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select
+        defaultValue={"86"}
         style={{
           width: 70
         }}
@@ -96,6 +139,10 @@ const Register = () => {
                 style={{
                   width: "100%"
                 }}
+                onChange={e => {
+                  const email = e.target.value;
+                  setEmail(email);
+                }}
               />
             </Form.Item>
 
@@ -114,6 +161,10 @@ const Register = () => {
                   width: "100%"
                 }}
                 placeholder="Phone Number"
+                onChange={e => {
+                  const phone = e.target.value;
+                  setPhone(phone);
+                }}
               />
             </Form.Item>
 
@@ -131,6 +182,10 @@ const Register = () => {
                 style={{
                   width: "100%"
                 }}
+                onChange={e => {
+                  const weChat = e.target.value;
+                  setWeChat(weChat);
+                }}
               />
             </Form.Item>
 
@@ -144,7 +199,13 @@ const Register = () => {
               ]}
               hasFeedback
             >
-              <Input.Password placeholder="Password" />
+              <Input.Password
+                placeholder="Password"
+                onChange={e => {
+                  const password = e.target.value;
+                  setPassword(password);
+                }}
+              />
             </Form.Item>
 
             <Form.Item
@@ -169,14 +230,36 @@ const Register = () => {
                 })
               ]}
             >
-              <Input.Password placeholder="Confirm Password" />
+              <Input.Password
+                placeholder="Confirm Password"
+                onChange={e => {
+                  const confirmPassword = e.target.value;
+                  setConfirmPassword(confirmPassword);
+                }}
+              />
             </Form.Item>
 
-            <Form.Item name="agreement" valuePropName="checked">
+            <Form.Item
+              name="agreement"
+              valuePropName="checked"
+              rules={[
+                {
+                  required: true,
+                  message: "Please read the agreement!"
+                }
+              ]}
+            >
               <Checkbox>
                 I have read the <a href="">agreement</a>
               </Checkbox>
             </Form.Item>
+            {isError ? (
+              <Form.Item name="error">
+                <span>something wrong ......</span>
+              </Form.Item>
+            ) : (
+              <div></div>
+            )}
             <Form.Item className="registerOrNot">
               <Button
                 type="primary"

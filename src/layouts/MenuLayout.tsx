@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 import { Layout, message, Menu, Breadcrumb, Dropdown } from "antd";
 import {
   UserOutlined,
@@ -17,7 +19,7 @@ type Props = {
 };
 
 const MenuLayout: React.FC<Props> = props => {
-  const [menus, setMenus] = useState(null);
+  const [menus, setMenus] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
 
   const onClick = ({ key = "" }) => {
@@ -26,6 +28,51 @@ const MenuLayout: React.FC<Props> = props => {
     }
 
     message.info(`Click on item ${key}`);
+  };
+
+  useEffect(() => {
+    renderMenu();
+  }, [menus]);
+
+  const renderMenu = () => {
+    axios({
+      method: "GET",
+      baseURL: "",
+      url: "/menu",
+      headers: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      responseType: "json"
+    })
+      .then(response => {
+        const respData = response.data;
+        if (respData) {
+          setMenus(respData);
+        }
+      })
+      .then(() => {
+        menus.map(menu => {
+          return (
+            <SubMenu
+              key="sub1"
+              title={
+                <span>
+                  <UserOutlined />
+                  <span>User</span>
+                </span>
+              }
+            >
+              <Menu.Item key="1">option1</Menu.Item>
+              <Menu.Item key="2">option2</Menu.Item>
+              <Menu.Item key="3">option3</Menu.Item>
+              <Menu.Item key="4">option4</Menu.Item>
+            </SubMenu>
+          );
+        });
+      })
+      .catch(function(error) {
+        console.log(error.toJSON());
+      });
   };
 
   const userMenu = (
@@ -85,6 +132,7 @@ const MenuLayout: React.FC<Props> = props => {
             defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
           >
+            {/* {renderMenu} */}
             <SubMenu
               key="sub1"
               title={
