@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Cookies } from "react-cookie";
+import Login from "../pages/Login";
 
 import { Layout, message, Menu, Breadcrumb, Dropdown } from "antd";
 import {
@@ -19,7 +21,7 @@ type Props = {
 };
 
 const MenuLayout: React.FC<Props> = props => {
-  const [menus, setMenus] = useState([]);
+  const [menus, setMenus] = useState({});
   const [collapsed, setCollapsed] = useState(false);
 
   const onClick = ({ key = "" }) => {
@@ -35,45 +37,124 @@ const MenuLayout: React.FC<Props> = props => {
   }, [menus]);
 
   const renderMenu = () => {
+    const userIDCookie = new Cookies();
+    const cookieID = userIDCookie.get("userID");
+    const queryMenuParam = "/user(" + cookieID + ")/menu";
+
+    // mock menus to render home menu
+    const mockMenus = [{
+      id: 1,      
+      code: "01",      
+      sequence: 1,      
+      name: "menu_01",      
+      subMenus: [{      
+              id: 1,      
+              code: "0101",      
+              sequence: 1,      
+              name: "menu_0101",      
+              subMenus: [{      
+                      id: 1,      
+                      code: "010101",      
+                      sequence: 1,      
+                      name: "menu_010101",      
+                      subMenus: []     
+                  }, {      
+                      id: 2,      
+                      code: "010102",      
+                      sequence: 2,      
+                      name: "menu_010102",      
+                      subMenus: []      
+                  }     
+              ]     
+          }, 
+          {     
+              id: 2,      
+              code: "0102",      
+              sequence: 2,      
+              name: "menu_0102",      
+              subMenus: [{      
+                      id: 1,      
+                      code: "010201",      
+                      sequence: 1,      
+                      name: "menu_010201",      
+                      subMenus: [{      
+                              id: 1,      
+                              code: "01020101",      
+                              sequence: 1,      
+                              name: "menu_01020101",      
+                              subMenus: []      
+                          }      
+                      ]      
+                  }      
+              ]      
+          }      
+      ]      
+    }]
+    console.log(mockMenus.length)    
+    renderMenuItems(mockMenus);
+
+
     axios({
       method: "GET",
       baseURL: "",
-      url: "/menu",
+      url: queryMenuParam,
       headers: {
         "content-type": "application/x-www-form-urlencoded"
       },
       responseType: "json"
     })
       .then(response => {
-        const respData = response.data;
+        const respData = response.data;    
         if (respData) {
           setMenus(respData);
         }
       })
       .then(() => {
-        menus.map(menu => {
-          return (
-            <SubMenu
-              key="sub1"
-              title={
-                <span>
-                  <UserOutlined />
-                  <span>User</span>
-                </span>
-              }
-            >
-              <Menu.Item key="1">option1</Menu.Item>
-              <Menu.Item key="2">option2</Menu.Item>
-              <Menu.Item key="3">option3</Menu.Item>
-              <Menu.Item key="4">option4</Menu.Item>
-            </SubMenu>
-          );
-        });
+        // renderMenuItems(menus);
       })
       .catch(function(error) {
         console.log(error.toJSON());
       });
   };
+
+  const renderMenuItems = (menusItems: any) => { 
+    menusItems.forEach((menusItem:any) => {
+      const subMenus = menusItem.subMenus;
+      return(
+        <SubMenu
+          key={menusItem.id}
+          title={
+            <span>
+              <UserOutlined />
+              <span>{menusItem.name}</span>
+            </span>
+          }
+        >
+          
+        </SubMenu>
+      )
+    })
+    
+    
+    // menusItems.map(menusItem => {
+    //   return (        
+    //     <SubMenu
+    //       key="1" menusItem.
+    //       title={
+    //         <span>
+    //           <UserOutlined />
+    //           <span>User</span>
+    //         </span>
+    //       }
+    //     >
+    //       <Menu.Item key="1">option1</Menu.Item>
+    //       <Menu.Item key="2">option2</Menu.Item>
+    //       <Menu.Item key="3">option3</Menu.Item>
+    //       <Menu.Item key="4">option4</Menu.Item>
+    //     </SubMenu>
+    //   );
+    // });
+  }
 
   const userMenu = (
     <Menu onClick={onClick}>
@@ -84,10 +165,6 @@ const MenuLayout: React.FC<Props> = props => {
       </Menu.Item>
     </Menu>
   );
-
-  useEffect(() => {
-    // invoke API to get Permission Session to store in Cookie
-  });
 
   return (
     <Layout>
@@ -132,7 +209,7 @@ const MenuLayout: React.FC<Props> = props => {
             defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
           >
-            {/* {renderMenu} */}
+            {/* {renderMenuItems} */}
             <SubMenu
               key="sub1"
               title={

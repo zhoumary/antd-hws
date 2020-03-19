@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
-// import Cookies from "universal-cookie";
+import { Cookies } from "react-cookie";
 
 import { Form, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -9,10 +9,8 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "./Login.css";
 import LoginRegister from "../layouts/LoginRegister";
 
-// const cookies = new Cookies();
-
 type Props = {
-  loginData: {};
+  loginCookie: Cookies;
 };
 
 const Login: React.FC<Props> = props => {
@@ -25,6 +23,8 @@ const Login: React.FC<Props> = props => {
   const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(false);
   const [canLogin, setCanLogin] = useState(true);
+
+  const loginCookies = new Cookies();
 
   useEffect(() => {
     if (userName !== "" && password !== "" && canLogin === true) {
@@ -68,8 +68,8 @@ const Login: React.FC<Props> = props => {
     let loginJudge: boolean = false;
 
     let bodyFormData = new FormData();
-    bodyFormData.set("username", userName);
-    bodyFormData.set("password", password);
+    bodyFormData.append("username", userName);
+    bodyFormData.append("password", password);
 
     axios({
       method: "POST",
@@ -92,9 +92,7 @@ const Login: React.FC<Props> = props => {
 
           // set cookies
           const respID = respData;
-          // const cookies = new Cookies();
-          // cookies.set("sessionID", respID, { path: "/" });
-          // console.log(cookies.get("sessionID"));
+          loginCookies.set("userID", userName, { path: "/" });
         }
       })
       .then(() => {
@@ -115,7 +113,7 @@ const Login: React.FC<Props> = props => {
 
   return (
     <Router>
-      <LoginRegister>
+      <LoginRegister cookie={loginCookies}>
         <div className="loginContent">
           <Form
             form={form}

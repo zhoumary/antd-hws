@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
 import qs from "qs";
+import { Cookies } from "react-cookie";
 
 import { Form, Input, Select, Checkbox, Button } from "antd";
 
@@ -25,6 +26,8 @@ const Register = () => {
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
+
+  const registerCookie = new Cookies();
 
   const onFinish = (event: {}) => {
     toRegister(event);
@@ -103,7 +106,7 @@ const Register = () => {
 
   return (
     <Router>
-      <LoginRegister>
+      <LoginRegister cookie={registerCookie}>
         <div className="registerContent">
           <Form
             className="register-form"

@@ -1,4 +1,6 @@
 import React from "react";
+import { Cookies } from "react-cookie";
+
 import { Layout } from "antd";
 
 import "./LoginRegister.css";
@@ -9,6 +11,7 @@ const { Header, Footer, Content } = Layout;
 
 type Props = {
   children: React.ReactNode;
+  cookie: Cookies;
 };
 
 const LoginRegister: React.FC<Props> = props => {
