@@ -16,38 +16,22 @@ const Register = () => {
   const [data, setData] = useState({});
   const [content, setContent] = useState({
     email: "",
-    phone: "",
+    phonePrefix: "86",
+    phoneNumber: "",
     wechat: "",
     password: "",
     confirmPassword: ""
   });
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [wechat, setWeChat] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [url, setUrl] = useState("http://hn.algolia.com/api/v1/register");
   const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
 
-  // how to get form content???
-  const getForm = () => {
-    setContent({
-      email: email,
-      phone: phone,
-      wechat: wechat,
-      password: password,
-      confirmPassword: confirmPassword
-    });
-  };
-
   const onFinish = (event: {}) => {
-    toLogin(event);
+    toRegister(event);
   };
 
-  const toLogin = (event: {}) => {
+  const toRegister = (event: {}) => {
     // call API to verify the Username and Password
-    getForm();
     callRegister();
   };
 
@@ -59,6 +43,7 @@ const Register = () => {
   }
 
   const callRegister = () => {
+    console.log(content);
     setIsError(false);
     let registerJudge: boolean = false;
 
@@ -67,10 +52,9 @@ const Register = () => {
       baseURL: "",
       url: "/register",
       headers: {
-        "content-type": "application/x-www-form-urlencoded"
+        "content-type": "application/json"
       },
       data: qs.stringify(content)
-      // data: qs.stringify(body),
     })
       .then(response => {
         const respData = response.data;
@@ -91,7 +75,11 @@ const Register = () => {
         }
       })
       .catch(function(error) {
-        console.log(error.toJSON());
+        const errorMsg = error.message;
+        if (errorMsg) {
+          setError(errorMsg);
+        }
+        setIsError(true);
       });
   };
 
@@ -101,6 +89,10 @@ const Register = () => {
         defaultValue={"86"}
         style={{
           width: 70
+        }}
+        onChange={e => {
+          const phonePrefix = e;
+          setContent({ ...content, phonePrefix: phonePrefix });
         }}
       >
         <Option value="86">+86</Option>
@@ -141,7 +133,7 @@ const Register = () => {
                 }}
                 onChange={e => {
                   const email = e.target.value;
-                  setEmail(email);
+                  setContent({ ...content, email: email });
                 }}
               />
             </Form.Item>
@@ -163,7 +155,7 @@ const Register = () => {
                 placeholder="Phone Number"
                 onChange={e => {
                   const phone = e.target.value;
-                  setPhone(phone);
+                  setContent({ ...content, phoneNumber: phone });
                 }}
               />
             </Form.Item>
@@ -184,7 +176,7 @@ const Register = () => {
                 }}
                 onChange={e => {
                   const weChat = e.target.value;
-                  setWeChat(weChat);
+                  setContent({ ...content, wechat: weChat });
                 }}
               />
             </Form.Item>
@@ -203,7 +195,7 @@ const Register = () => {
                 placeholder="Password"
                 onChange={e => {
                   const password = e.target.value;
-                  setPassword(password);
+                  setContent({ ...content, password: password });
                 }}
               />
             </Form.Item>
@@ -234,7 +226,7 @@ const Register = () => {
                 placeholder="Confirm Password"
                 onChange={e => {
                   const confirmPassword = e.target.value;
-                  setConfirmPassword(confirmPassword);
+                  setContent({ ...content, confirmPassword: confirmPassword });
                 }}
               />
             </Form.Item>
@@ -255,7 +247,7 @@ const Register = () => {
             </Form.Item>
             {isError ? (
               <Form.Item name="error">
-                <span>something wrong ......</span>
+                <span style={{ color: "#ff4d4f" }}>{error}</span>
               </Form.Item>
             ) : (
               <div></div>
@@ -265,7 +257,7 @@ const Register = () => {
                 type="primary"
                 htmlType="submit"
                 className="register-form-button"
-                onClick={toLogin}
+                onClick={toRegister}
               >
                 Register
               </Button>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
-import qs from "qs";
+// import Cookies from "universal-cookie";
 
 import { Form, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -9,25 +9,22 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "./Login.css";
 import LoginRegister from "../layouts/LoginRegister";
 
+// const cookies = new Cookies();
+
 type Props = {
   loginData: {};
 };
 
 const Login: React.FC<Props> = props => {
   const [form] = Form.useForm();
-  const [, forceUpdate] = useState();
 
   const [data, setData] = useState({});
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(false);
   const [canLogin, setCanLogin] = useState(true);
-
-  // To disable submit button at the beginning.
-  useEffect(() => {
-    forceUpdate({});
-  }, []);
 
   useEffect(() => {
     if (userName !== "" && password !== "" && canLogin === true) {
@@ -70,23 +67,18 @@ const Login: React.FC<Props> = props => {
     setIsError(false);
     let loginJudge: boolean = false;
 
-    const body = {
-      name: userName,
-      key: password
-    };
+    let bodyFormData = new FormData();
+    bodyFormData.set("username", userName);
+    bodyFormData.set("password", password);
 
     axios({
       method: "POST",
       baseURL: "",
       url: "/login",
       headers: {
-        "content-type": "application/x-www-form-urlencoded"
+        "content-type": "multipart/form-data"
       },
-      auth: {
-        username: userName,
-        password: password
-      }
-      // data: qs.stringify(body),
+      data: bodyFormData
     })
       .then(response => {
         const respData = response.data;
@@ -97,6 +89,12 @@ const Login: React.FC<Props> = props => {
         } else if (!isEmpty(respData) && isLogin === false) {
           setIsLogin(true);
           loginJudge = true;
+
+          // set cookies
+          const respID = respData;
+          // const cookies = new Cookies();
+          // cookies.set("sessionID", respID, { path: "/" });
+          // console.log(cookies.get("sessionID"));
         }
       })
       .then(() => {
@@ -107,7 +105,11 @@ const Login: React.FC<Props> = props => {
         }
       })
       .catch(function(error) {
-        console.log(error.toJSON());
+        const errorMsg = error.message;
+        if (errorMsg) {
+          setError(errorMsg);
+        }
+        setIsError(true);
       });
   };
 
@@ -173,7 +175,7 @@ const Login: React.FC<Props> = props => {
 
             {isError ? (
               <Form.Item name="error">
-                <span>something wrong ......</span>
+                <span style={{ color: "#ff4d4f" }}>{error}</span>
               </Form.Item>
             ) : (
               <div></div>

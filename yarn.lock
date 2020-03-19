@@ -1500,6 +1500,11 @@
     "@types/testing-library__dom" "*"
     pretty-format "^25.1.0"
 
+"@types/universal-cookie@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.npm.taobao.org/@types/universal-cookie/download/@types/universal-cookie-2.2.0.tgz#36fba91f8a8c64cfd109520d15ec2ec3f32561e9"
+  integrity sha1-NvupH4qMZM/RCVINFewuw/MlYek=
+
 "@types/yargs-parser@*":
   version "15.0.0"
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-15.0.0.tgz#cb3f9f741869e20cce330ffbeb9271590483882d"
