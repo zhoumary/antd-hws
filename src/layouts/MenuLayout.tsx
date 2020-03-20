@@ -24,6 +24,10 @@ const MenuLayout: React.FC<Props> = props => {
   const [menus, setMenus] = useState({});
   const [collapsed, setCollapsed] = useState(false);
 
+  const [data, setData] = useState({});
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
+
   const onClick = ({ key = "" }) => {
     if (key == "3") {
       return;
@@ -36,63 +40,35 @@ const MenuLayout: React.FC<Props> = props => {
     renderMenu();
   }, [menus]);
 
+  const renderMenuItems = (menusItems: any) => { 
+    return  (<SubMenu
+      key={menusItems.id}
+      title={
+        <span>
+          <UserOutlined />
+          <span>{menusItems.name}</span>
+        </span>
+      }
+    >
+      {renderSubMenus(menusItems.subMenus)}
+    </SubMenu>)
+  }
+
+  const renderSubMenus = (subMenus: any) => {
+    console.log(subMenus.length)
+    if (subMenus.length == 1) {
+      return <Menu.Item key={subMenus[0].id}>{subMenus[0].name}</Menu.Item>     
+    } else if (subMenus.length > 1) {
+      return subMenus.map(renderMenuItems)      
+    } else if (subMenus.length == 0) {
+      return 
+    }
+  }
+
   const renderMenu = () => {
     const userIDCookie = new Cookies();
     const cookieID = userIDCookie.get("userID");
-    const queryMenuParam = "/user(" + cookieID + ")/menu";
-
-    // mock menus to render home menu
-    const mockMenus = [{
-      id: 1,      
-      code: "01",      
-      sequence: 1,      
-      name: "menu_01",      
-      subMenus: [{      
-              id: 1,      
-              code: "0101",      
-              sequence: 1,      
-              name: "menu_0101",      
-              subMenus: [{      
-                      id: 1,      
-                      code: "010101",      
-                      sequence: 1,      
-                      name: "menu_010101",      
-                      subMenus: []     
-                  }, {      
-                      id: 2,      
-                      code: "010102",      
-                      sequence: 2,      
-                      name: "menu_010102",      
-                      subMenus: []      
-                  }     
-              ]     
-          }, 
-          {     
-              id: 2,      
-              code: "0102",      
-              sequence: 2,      
-              name: "menu_0102",      
-              subMenus: [{      
-                      id: 1,      
-                      code: "010201",      
-                      sequence: 1,      
-                      name: "menu_010201",      
-                      subMenus: [{      
-                              id: 1,      
-                              code: "01020101",      
-                              sequence: 1,      
-                              name: "menu_01020101",      
-                              subMenus: []      
-                          }      
-                      ]      
-                  }      
-              ]      
-          }      
-      ]      
-    }]
-    console.log(mockMenus.length)    
-    renderMenuItems(mockMenus);
-
+    const queryMenuParam = "/user(" + cookieID + ")/menu";          
 
     axios({
       method: "GET",
@@ -117,54 +93,98 @@ const MenuLayout: React.FC<Props> = props => {
       });
   };
 
-  const renderMenuItems = (menusItems: any) => { 
-    menusItems.forEach((menusItem:any) => {
-      const subMenus = menusItem.subMenus;
-      return(
-        <SubMenu
-          key={menusItem.id}
-          title={
-            <span>
-              <UserOutlined />
-              <span>{menusItem.name}</span>
-            </span>
-          }
-        >
-          
-        </SubMenu>
-      )
+  const logout = () => {
+    setIsError(false);
+
+    const currCookie = new Cookies();
+
+    let bodyFormData = new FormData();
+    bodyFormData.append("username", currCookie.get("username"));
+    bodyFormData.append("password", currCookie.get("password"));
+
+    axios({
+      method: "GET",
+      url: "http://10.130.228.66:9091/logout",
     })
-    
-    
-    // menusItems.map(menusItem => {
-    //   return (        
-    //     <SubMenu
-    //       key="1" menusItem.
-    //       title={
-    //         <span>
-    //           <UserOutlined />
-    //           <span>User</span>
-    //         </span>
-    //       }
-    //     >
-    //       <Menu.Item key="1">option1</Menu.Item>
-    //       <Menu.Item key="2">option2</Menu.Item>
-    //       <Menu.Item key="3">option3</Menu.Item>
-    //       <Menu.Item key="4">option4</Menu.Item>
-    //     </SubMenu>
-    //   );
-    // });
+      .then(response => {
+        const respData = response.status;
+        console.log(respData)
+        setData(respData);
+        if (respData == 200) {
+          // go to login page
+          const loginPage = "http://localhost:3000/";
+          window.location.href = loginPage;
+        }
+      })
+      .catch(function(error) {
+        const errorMsg = error.message;
+        if (errorMsg) {
+          setError(errorMsg);
+        }
+        setIsError(true);
+      });
+
+
   }
 
   const userMenu = (
     <Menu onClick={onClick}>
       <Menu.Item key="1">User Center</Menu.Item>
       <Menu.Item key="2">User Settings</Menu.Item>
-      <Menu.Item key="3">
-        <a href="/">Log Out</a>
-      </Menu.Item>
+      <Menu.Item key="3" onClick={logout}>Log Out</Menu.Item>
     </Menu>
   );
+
+  // mock menus to render home menu
+  const mockMenus = [{
+    id: 1,      
+    code: "01",      
+    sequence: 1,      
+    name: "menu_01",      
+    subMenus: [{      
+            id: 1,      
+            code: "0101",      
+            sequence: 1,      
+            name: "menu_0101",      
+            subMenus: [{      
+                    id: 1,      
+                    code: "010101",      
+                    sequence: 1,      
+                    name: "menu_010101",      
+                    subMenus: []     
+                }, {      
+                    id: 2,      
+                    code: "010102",      
+                    sequence: 2,      
+                    name: "menu_010102",      
+                    subMenus: []      
+                }     
+            ]     
+        }, 
+        {     
+            id: 2,      
+            code: "0102",      
+            sequence: 2,      
+            name: "menu_0102",      
+            subMenus: [{      
+                    id: 1,      
+                    code: "010201",      
+                    sequence: 1,      
+                    name: "menu_010201",      
+                    subMenus: [{      
+                            id: 1,      
+                            code: "01020101",      
+                            sequence: 1,      
+                            name: "menu_01020101",      
+                            subMenus: []      
+                        }      
+                    ]      
+                }      
+            ]      
+        }      
+    ]      
+  }]
+  console.log(mockMenus.length)
 
   return (
     <Layout>
@@ -209,49 +229,7 @@ const MenuLayout: React.FC<Props> = props => {
             defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
           >
-            {/* {renderMenuItems} */}
-            <SubMenu
-              key="sub1"
-              title={
-                <span>
-                  <UserOutlined />
-                  <span>User</span>
-                </span>
-              }
-            >
-              <Menu.Item key="1">option1</Menu.Item>
-              <Menu.Item key="2">option2</Menu.Item>
-              <Menu.Item key="3">option3</Menu.Item>
-              <Menu.Item key="4">option4</Menu.Item>
-            </SubMenu>
-            <SubMenu
-              key="sub2"
-              title={
-                <span>
-                  <LaptopOutlined />
-                  <span>subnav 2</span>
-                </span>
-              }
-            >
-              <Menu.Item key="5">option5</Menu.Item>
-              <Menu.Item key="6">option6</Menu.Item>
-              <Menu.Item key="7">option7</Menu.Item>
-              <Menu.Item key="8">option8</Menu.Item>
-            </SubMenu>
-            <SubMenu
-              key="sub3"
-              title={
-                <span>
-                  <NotificationOutlined />
-                  <span>subnav 3</span>
-                </span>
-              }
-            >
-              <Menu.Item key="9">option9</Menu.Item>
-              <Menu.Item key="10">option10</Menu.Item>
-              <Menu.Item key="11">option11</Menu.Item>
-              <Menu.Item key="12">option12</Menu.Item>
-            </SubMenu>
+            {mockMenus.map(renderMenuItems)}
           </Menu>
         </Sider>
         <Layout style={{ padding: "0 24px 24px" }}>

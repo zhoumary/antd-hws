@@ -16,7 +16,6 @@ type Props = {
 const Login: React.FC<Props> = props => {
   const [form] = Form.useForm();
 
-  const [data, setData] = useState({});
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [isError, setIsError] = useState(false);
@@ -70,19 +69,19 @@ const Login: React.FC<Props> = props => {
     let bodyFormData = new FormData();
     bodyFormData.append("username", userName);
     bodyFormData.append("password", password);
-
+    
     axios({
       method: "POST",
-      baseURL: "",
-      url: "/login",
+      url: "http://10.130.228.66:9091/login",
       headers: {
         "content-type": "multipart/form-data"
-      },
-      data: bodyFormData
+      },      
+      data: bodyFormData,
+      withCredentials: false,
     })
       .then(response => {
+        console.log(response)
         const respData = response.data;
-        setData(respData);
         if (isEmpty(respData) && isLogin === true) {
           setIsLogin(false);
           loginJudge = false;
@@ -91,8 +90,12 @@ const Login: React.FC<Props> = props => {
           loginJudge = true;
 
           // set cookies
-          const respID = respData;
-          loginCookies.set("userID", userName, { path: "/" });
+          const authorities = respData.authorites;
+          const userID = respData.id;
+          loginCookies.set("username", userName, { path: "/" });
+          loginCookies.set("password", password, { path: "/" });
+          loginCookies.set("permissions", authorities, { path: "/" })
+          loginCookies.set("userID", userID, { path: "/" })
         }
       })
       .then(() => {

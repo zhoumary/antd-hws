@@ -17,12 +17,13 @@ const Register = () => {
   const [data, setData] = useState({});
   const [content, setContent] = useState({
     email: "",
-    phonePrefix: "86",
-    phoneNumber: "",
-    wechat: "",
+    mobile: "",
+    name: "",
     password: "",
+    roles:  Array,
     confirmPassword: ""
   });
+  let selectedRoles:any = [];
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
@@ -49,15 +50,16 @@ const Register = () => {
     console.log(content);
     setIsError(false);
     let registerJudge: boolean = false;
+    let testContent = qs.stringify(content)
+    console.log(testContent);
 
     axios({
       method: "POST",
-      baseURL: "",
-      url: "/register",
+      url: "http://10.130.228.66:9091/api/v1/users",
       headers: {
         "content-type": "application/json"
       },
-      data: qs.stringify(content)
+      data: content
     })
       .then(response => {
         const respData = response.data;
@@ -68,6 +70,10 @@ const Register = () => {
         } else if (!isEmpty(respData) && isRegister === false) {
           setIsRegister(true);
           registerJudge = true;
+
+          // save user id to cookie
+          const userIDCookie = new Cookies()
+          userIDCookie.set("userID", respData.id, { path: "/" })
         }
       })
       .then(() => {
@@ -78,6 +84,8 @@ const Register = () => {
         }
       })
       .catch(function(error) {
+        console.log(error.response)
+        
         const errorMsg = error.message;
         if (errorMsg) {
           setError(errorMsg);
@@ -95,7 +103,7 @@ const Register = () => {
         }}
         onChange={e => {
           const phonePrefix = e;
-          setContent({ ...content, phonePrefix: phonePrefix });
+          // setContent({ ...content, phonePrefix: phonePrefix });
         }}
       >
         <Option value="86">+86</Option>
@@ -103,6 +111,8 @@ const Register = () => {
       </Select>
     </Form.Item>
   );
+
+  
 
   return (
     <Router>
@@ -116,6 +126,27 @@ const Register = () => {
             initialValues={{}}
             scrollToFirstError
           >
+            <Form.Item
+              name="name"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your wechat number!"
+                }
+              ]}
+            >
+              <Input
+                placeholder="Name"
+                style={{
+                  width: "100%"
+                }}
+                onChange={e => {
+                  const name = e.target.value;
+                  setContent({ ...content, name: name });
+                }}
+              />
+            </Form.Item>
+            
             <Form.Item
               name="email"
               rules={[
@@ -158,31 +189,32 @@ const Register = () => {
                 placeholder="Phone Number"
                 onChange={e => {
                   const phone = e.target.value;
-                  setContent({ ...content, phoneNumber: phone });
+                  setContent({ ...content, mobile: phone });
                 }}
               />
             </Form.Item>
 
             <Form.Item
-              name="wechat"
+              name="role"
               rules={[
                 {
                   required: true,
-                  message: "Please input your wechat number!"
+                  message: "Please select your roles!"
                 }
               ]}
             >
-              <Input
-                placeholder="WeChat"
-                style={{
-                  width: "100%"
-                }}
+              <Select
+                mode="multiple"
+                style={{ width: '100%' }}
+                placeholder="Please select"
                 onChange={e => {
-                  const weChat = e.target.value;
-                  setContent({ ...content, wechat: weChat });
+                  selectedRoles.push(e) 
+                  setContent({ ...content, roles: selectedRoles });
                 }}
-              />
-            </Form.Item>
+              >
+                {}
+              </Select>
+            </Form.Item>            
 
             <Form.Item
               name="password"
