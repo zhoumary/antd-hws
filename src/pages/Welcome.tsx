@@ -46,22 +46,25 @@ const Welcome = () => {
           }
           setIsError(true);
         });
+    } else {
+      setIsError(true);
+      setError("The user information is incomplete.")
     }
   };
 
   const renderUserInfo = () => {
     if (userInfo) {
-      // Object.keys(userInfo).map(function(key, index) {
-      //   return (
-      //     <Card
-      //         style={{ marginTop: 16 }}
-      //         type="inner"
-      //         title="Inner Card title"
-      //       >
-      //         userInfo[key]
-      //     </Card>
-      //   )
-      // });
+      Object.keys(userInfo).map(function(key, index) {
+        return (
+          <Card
+              style={{ marginTop: 16 }}
+              type="inner"
+              title="Inner Card title"
+            >
+              userInfo.key
+          </Card>
+        )
+      });
     }
   }
 
@@ -90,7 +93,7 @@ const Welcome = () => {
               type="inner"
               title="User"
             >
-              User Information
+              {renderUserInfo}
             </Card>
             )}
           </Card>

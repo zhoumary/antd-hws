@@ -25,6 +25,7 @@ const Register = () => {
   });
   let selectedRoles:any = [];
   let allRoles:any = [];
+  let allShowRoles:any = [];
   let allRolesDesc:any = [];
   const [isRoleError, setIsRoleError] = useState(false);
   const [roleError, setRoleError] = useState("");
@@ -78,7 +79,7 @@ const Register = () => {
 
   const loadRolesDesc = () => {
     allRoles.foreach((eachOne:any) => {
-      return (<Option key={eachOne.id} value={eachOne.id}>{eachOne.description}</Option>)
+      allShowRoles.push(<Option key={eachOne.id} value={eachOne.id}>{eachOne.description}</Option>)
     })
   }
 
@@ -265,7 +266,7 @@ const Register = () => {
                   setContent({ ...content, roles: selectedRoles });
                 }}
               >
-                {loadRolesDesc}
+                {allShowRoles}
               </Select>
             </Form.Item>            
 

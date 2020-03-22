@@ -22,6 +22,7 @@ type Props = {
 
 const MenuLayout: React.FC<Props> = props => {
   const [menus, setMenus] = useState({});
+  const [subMenus, setSubMenus] = useState({})
   const [collapsed, setCollapsed] = useState(false);
 
   const [data, setData] = useState({});
@@ -37,12 +38,13 @@ const MenuLayout: React.FC<Props> = props => {
   };
 
   useEffect(() => {
-    renderMenu();
-  }, [menus]);
+    // renderMenu();
+  }, []); 
+  
 
   const renderMenuItems = (menusItems: any) => { 
     return  (<SubMenu
-      key={menusItems.id}
+      key={menusItems.code}
       title={
         <span>
           <UserOutlined />
@@ -55,15 +57,126 @@ const MenuLayout: React.FC<Props> = props => {
   }
 
   const renderSubMenus = (subMenus: any) => {
-    console.log(subMenus.length)
+    console.log("child" + subMenus.length)
     if (subMenus.length == 1) {
-      return <Menu.Item key={subMenus[0].id}>{subMenus[0].name}</Menu.Item>     
+      // judge its subMenus count
+      let menuItems:any = [];
+      if (subMenus[0].subMenus.length == 0) {
+        menuItems.push(<Menu.Item key={subMenus[0].code}>{subMenus[0].name}</Menu.Item>)
+      } else if (subMenus[0].subMenus.length >= 1) {  
+        menuItems.push(renderMenuItems(subMenus[0]))
+      }
+      if (menuItems) {
+        return menuItems 
+      }          
     } else if (subMenus.length > 1) {
-      return subMenus.map(renderMenuItems)      
+      let menuItems:any = [];
+      subMenus.map((subMenu:any) => {
+        // judge its subMenus count
+        if (subMenu.subMenus.length == 0) {
+          menuItems.push(<Menu.Item key={subMenu.code}>{subMenu.name}</Menu.Item>)
+        } else if (subMenu.subMenus.length >= 1) {
+          menuItems.push(renderMenuItems(subMenu))
+        } 
+      })
+      if (menuItems) {
+        return menuItems 
+      }          
     } else if (subMenus.length == 0) {
       return 
     }
   }
+
+  // mock menus to render home menu
+  const mockMenus = [{
+    id: 1,      
+    code: "01",      
+    sequence: 1,      
+    name: "menu_01",      
+    subMenus: [{      
+            id: 1,      
+            code: "0101",      
+            sequence: 1,      
+            name: "menu_0101",      
+            subMenus: [{      
+              id: 1,      
+              code: "010101",      
+              sequence: 1,      
+              name: "menu_010101",      
+              subMenus: []     
+          }, {      
+            id: 2,      
+            code: "010102",      
+            sequence: 2,      
+            name: "menu_010102",      
+            subMenus: []      
+        }]     
+        }, 
+        {     
+            id: 2,      
+            code: "0102",      
+            sequence: 2,      
+            name: "menu_0102",      
+            subMenus: [{      
+              id: 1,      
+              code: "010201",      
+              sequence: 1,      
+              name: "menu_010201",      
+              subMenus: [{      
+                id: 1,      
+                code: "01020101",      
+                sequence: 1,      
+                name: "menu_01020101",      
+                subMenus: []      
+            }]      
+          }]      
+        }      
+    ]      
+  },{
+    id: 2,      
+    code: "02",      
+    sequence: 2,      
+    name: "menu_02",      
+    subMenus: [{      
+            id: 1,      
+            code: "0201",      
+            sequence: 1,      
+            name: "menu_0201",      
+            subMenus: [{      
+              id: 1,      
+              code: "020101",      
+              sequence: 1,      
+              name: "menu_020101",      
+              subMenus: []     
+          }, {      
+            id: 2,      
+            code: "010202",      
+            sequence: 2,      
+            name: "menu_010202",      
+            subMenus: []      
+        }]     
+        }, 
+        {     
+            id: 2,      
+            code: "0202",      
+            sequence: 2,      
+            name: "menu_0202",      
+            subMenus: [{      
+              id: 1,      
+              code: "020201",      
+              sequence: 1,      
+              name: "menu_020201",      
+              subMenus: [{      
+                id: 1,      
+                code: "02020101",      
+                sequence: 1,      
+                name: "menu_01020101",      
+                subMenus: []      
+            }]      
+          }]      
+        }      
+    ]      
+  }]
 
   const renderMenu = () => {
     const userIDCookie = new Cookies();
@@ -140,57 +253,6 @@ const MenuLayout: React.FC<Props> = props => {
     </Menu>
   );
 
-  // mock menus to render home menu
-  const mockMenus = [{
-    id: 1,      
-    code: "01",      
-    sequence: 1,      
-    name: "menu_01",      
-    subMenus: [{      
-            id: 1,      
-            code: "0101",      
-            sequence: 1,      
-            name: "menu_0101",      
-            subMenus: [{      
-                    id: 1,      
-                    code: "010101",      
-                    sequence: 1,      
-                    name: "menu_010101",      
-                    subMenus: []     
-                }, {      
-                    id: 2,      
-                    code: "010102",      
-                    sequence: 2,      
-                    name: "menu_010102",      
-                    subMenus: []      
-                }     
-            ]     
-        }, 
-        {     
-            id: 2,      
-            code: "0102",      
-            sequence: 2,      
-            name: "menu_0102",      
-            subMenus: [{      
-                    id: 1,      
-                    code: "010201",      
-                    sequence: 1,      
-                    name: "menu_010201",      
-                    subMenus: [{      
-                            id: 1,      
-                            code: "01020101",      
-                            sequence: 1,      
-                            name: "menu_01020101",      
-                            subMenus: []      
-                        }      
-                    ]      
-                }      
-            ]      
-        }      
-    ]      
-  }]
-  console.log(mockMenus.length)
-
   return (
     <Layout>
       <Header className="header">
@@ -230,8 +292,8 @@ const MenuLayout: React.FC<Props> = props => {
           <Menu
             theme="dark"
             mode="inline"
-            defaultSelectedKeys={["1"]}
-            defaultOpenKeys={["sub1"]}
+            // defaultSelectedKeys={["1"]}
+            // defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
           >
             {mockMenus.map(renderMenuItems)}
