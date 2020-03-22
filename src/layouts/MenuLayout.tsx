@@ -103,8 +103,13 @@ const MenuLayout: React.FC<Props> = props => {
     bodyFormData.append("password", currCookie.get("password"));
 
     axios({
-      method: "GET",
+      method: "POST",
       url: "http://10.130.228.66:9091/logout",
+      headers: {
+        "content-type": "multipart/form-data"
+      },      
+      data: bodyFormData,
+      withCredentials: false,
     })
       .then(response => {
         const respData = response.status;

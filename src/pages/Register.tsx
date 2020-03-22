@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
 import qs from "qs";
@@ -24,11 +24,63 @@ const Register = () => {
     confirmPassword: ""
   });
   let selectedRoles:any = [];
+  let allRoles:any = [];
+  let allRolesDesc:any = [];
+  const [isRoleError, setIsRoleError] = useState(false);
+  const [roleError, setRoleError] = useState("");
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState("");
   const [isRegister, setIsRegister] = useState(false);
 
   const registerCookie = new Cookies();
+
+  useEffect(() => {
+    getAllRoles()
+  }, [])
+
+  function isEmpty(obj: Object) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) return false;
+    }
+    return true;
+  }
+
+  const getAllRoles = () => {
+    setIsRoleError(false);
+    
+    axios({
+      method: "GET",
+      url: "http://10.130.228.66:9091/roles",
+    })
+      .then(response => {
+        const respData = response.data;
+        console.log(respData)
+        setData(respData);
+        if (!isEmpty(respData)) {
+          // save the roles to allRoles and allRolesDesc
+          allRoles = respData;
+
+          loadRolesDesc();
+
+          allRolesDesc = respData.map((eachRole:any) => {
+            allRolesDesc.push(eachRole.description);
+          })
+        }
+      })
+      .catch(function(error) {
+        const errorMsg = error.message;
+        if (errorMsg) {
+          setRoleError(errorMsg);
+        }
+        setIsRoleError(true);
+      });
+  }
+
+  const loadRolesDesc = () => {
+    allRoles.foreach((eachOne:any) => {
+      return (<Option key={eachOne.id} value={eachOne.id}>{eachOne.description}</Option>)
+    })
+  }
 
   const onFinish = (event: {}) => {
     toRegister(event);
@@ -37,14 +89,7 @@ const Register = () => {
   const toRegister = (event: {}) => {
     // call API to verify the Username and Password
     callRegister();
-  };
-
-  function isEmpty(obj: Object) {
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) return false;
-    }
-    return true;
-  }
+  };  
 
   const callRegister = () => {
     console.log(content);
@@ -55,7 +100,7 @@ const Register = () => {
 
     axios({
       method: "POST",
-      url: "http://10.130.228.66:9091/api/v1/users",
+      url: "http://10.130.228.66:9091/api/v1/users/register",
       headers: {
         "content-type": "application/json"
       },
@@ -194,6 +239,14 @@ const Register = () => {
               />
             </Form.Item>
 
+            
+            {isRoleError ? (
+              <Form.Item name="error">
+                <span style={{ color: "#ff4d4f" }}>{roleError}</span>
+              </Form.Item>
+            ) : (
+              <div></div>
+            )}
             <Form.Item
               name="role"
               rules={[
@@ -212,7 +265,7 @@ const Register = () => {
                   setContent({ ...content, roles: selectedRoles });
                 }}
               >
-                {}
+                {loadRolesDesc}
               </Select>
             </Form.Item>            
 
