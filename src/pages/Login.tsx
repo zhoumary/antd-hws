@@ -106,9 +106,14 @@ const Login: React.FC<Props> = props => {
         }
       })
       .catch(function(error) {
-        const errorMsg = error.message;
-        if (errorMsg) {
+        const errorResp = error.response;
+        const errorRespData = errorResp.data;
+        let errorMsg:string;
+        if (errorRespData.message) {
+          errorMsg = errorRespData.message
           setError(errorMsg);
+        } else {
+          setError(errorRespData);
         }
         setIsError(true);
       });

@@ -20,13 +20,11 @@ const Register = () => {
     mobile: "",
     name: "",
     password: "",
-    roles:  Array,
+    roles:  [],
     confirmPassword: ""
   });
   let selectedRoles:any = [];
-  let allRoles:any = [];
-  let allShowRoles:any = [];
-  let allRolesDesc:any = [];
+  const [allRoles, setallRoles] = useState([])
   const [isRoleError, setIsRoleError] = useState(false);
   const [roleError, setRoleError] = useState("");
   const [isError, setIsError] = useState(false);
@@ -51,36 +49,33 @@ const Register = () => {
     
     axios({
       method: "GET",
-      url: "http://10.130.228.66:9091/roles",
+      url: "http://10.130.228.66:9091/api/v1/roles",
     })
       .then(response => {
         const respData = response.data;
         console.log(respData)
         setData(respData);
         if (!isEmpty(respData)) {
-          // save the roles to allRoles and allRolesDesc
-          allRoles = respData;
-
-          loadRolesDesc();
-
-          allRolesDesc = respData.map((eachRole:any) => {
-            allRolesDesc.push(eachRole.description);
-          })
+          setallRoles(respData);
         }
       })
       .catch(function(error) {
-        const errorMsg = error.message;
-        if (errorMsg) {
+        const errorResp = error.response;
+        const errorRespData = errorResp.data;
+        let errorMsg:string;
+        if (errorRespData.message) {
+          errorMsg = errorRespData.message
           setRoleError(errorMsg);
+        } else {
+          setRoleError(errorRespData);
         }
         setIsRoleError(true);
       });
   }
 
-  const loadRolesDesc = () => {
-    allRoles.foreach((eachOne:any) => {
-      allShowRoles.push(<Option key={eachOne.id} value={eachOne.id}>{eachOne.description}</Option>)
-    })
+  const loadRolesDesc = (eachRole:any) => {
+    
+    return(<Option key={eachRole.id} value={eachRole.id}>{eachRole.description}</Option>)
   }
 
   const onFinish = (event: {}) => {
@@ -120,6 +115,8 @@ const Register = () => {
           // save user id to cookie
           const userIDCookie = new Cookies()
           userIDCookie.set("userID", respData.id, { path: "/" })
+          userIDCookie.set("username", content.email, { path: "/" })
+          userIDCookie.set("password", content.password, { path: "/" })
         }
       })
       .then(() => {
@@ -129,12 +126,15 @@ const Register = () => {
           window.location.href = login;
         }
       })
-      .catch(function(error) {
-        console.log(error.response)
-        
-        const errorMsg = error.message;
-        if (errorMsg) {
+      .catch(function(error) {        
+        const errorResp = error.response;
+        const errorRespData = errorResp.data;
+        let errorMsg:string;
+        if (errorRespData.message) {
+          errorMsg = errorRespData.message
           setError(errorMsg);
+        } else {
+          setError(errorRespData);
         }
         setIsError(true);
       });
@@ -262,11 +262,12 @@ const Register = () => {
                 style={{ width: '100%' }}
                 placeholder="Please select"
                 onChange={e => {
-                  selectedRoles.push(e) 
+                  selectedRoles = e 
+                  
                   setContent({ ...content, roles: selectedRoles });
                 }}
               >
-                {allShowRoles}
+                {allRoles.map(loadRolesDesc)}
               </Select>
             </Form.Item>            
 

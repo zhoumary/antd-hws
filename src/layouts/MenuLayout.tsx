@@ -3,7 +3,7 @@ import axios from "axios";
 import { Cookies } from "react-cookie";
 import Login from "../pages/Login";
 
-import { Layout, message, Menu, Breadcrumb, Dropdown } from "antd";
+import { Layout, message, Menu, Breadcrumb, Dropdown, Alert } from "antd";
 import {
   UserOutlined,
   LaptopOutlined,
@@ -21,13 +21,14 @@ type Props = {
 };
 
 const MenuLayout: React.FC<Props> = props => {
-  const [menus, setMenus] = useState({});
-  const [subMenus, setSubMenus] = useState({})
+  // const [menus, setMenus] = useState({});
   const [collapsed, setCollapsed] = useState(false);
 
+  const currCookie = new Cookies();
+
   const [data, setData] = useState({});
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState("");
+  const [isLogoutError, setIsLogoutError] = useState(false);
+  const [isMenuError, setIsMenuError] = useState(false);
 
   const onClick = ({ key = "" }) => {
     if (key == "3") {
@@ -57,7 +58,6 @@ const MenuLayout: React.FC<Props> = props => {
   }
 
   const renderSubMenus = (subMenus: any) => {
-    console.log("child" + subMenus.length)
     if (subMenus.length == 1) {
       // judge its subMenus count
       let menuItems:any = [];
@@ -179,6 +179,8 @@ const MenuLayout: React.FC<Props> = props => {
   }]
 
   const renderMenu = () => {
+    setIsMenuError(false);
+    
     const userIDCookie = new Cookies();
     const cookieID = userIDCookie.get("userID");
     const queryMenuParam = "/user(" + cookieID + ")/menu";          
@@ -195,22 +197,29 @@ const MenuLayout: React.FC<Props> = props => {
       .then(response => {
         const respData = response.data;    
         if (respData) {
-          setMenus(respData);
+          // setMenus(respData);
         }
       })
       .then(() => {
         // renderMenuItems(menus);
       })
       .catch(function(error) {
-        console.log(error.toJSON());
+        const errorResp = error.response;
+        const errorRespData = errorResp.data;
+        let errorMsg:string;
+        if (errorRespData.message) {
+          errorMsg = errorRespData.message
+          message.error("menu" + errorMsg);
+        } else {
+          message.error("menu" + errorRespData);
+        }
+        setIsMenuError(true);
       });
   };
 
   const logout = () => {
-    setIsError(false);
-
-    const currCookie = new Cookies();
-
+    setIsLogoutError(false);
+    
     let bodyFormData = new FormData();
     bodyFormData.append("username", currCookie.get("username"));
     bodyFormData.append("password", currCookie.get("password"));
@@ -229,17 +238,24 @@ const MenuLayout: React.FC<Props> = props => {
         console.log(respData)
         setData(respData);
         if (respData == 200) {
+          message.success("Logout Succeed!");
+          
           // go to login page
           const loginPage = "http://localhost:3000/";
           window.location.href = loginPage;
         }
       })
       .catch(function(error) {
-        const errorMsg = error.message;
-        if (errorMsg) {
-          setError(errorMsg);
+        const errorResp = error.response;
+        const errorRespData = errorResp.data;
+        let errorMsg:string;
+        if (errorRespData.message) {
+          errorMsg = errorRespData.message
+          message.error("logout" + errorMsg);
+        } else {
+          message.error("logout" + errorRespData);
         }
-        setIsError(true);
+        setIsLogoutError(true);
       });
 
 
@@ -275,7 +291,7 @@ const MenuLayout: React.FC<Props> = props => {
                 className="ant-dropdown-link"
                 onClick={e => e.preventDefault()}
               >
-                Test User
+                {currCookie.get("username")}
               </a>
             </Dropdown>
           </Menu.Item>

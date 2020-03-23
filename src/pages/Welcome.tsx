@@ -10,7 +10,7 @@ import MenuLayout from "../layouts/MenuLayout";
 import SAPLogo from "../assets/sap.svg";
 
 const Welcome = () => {
-  const [userInfo, setUserInfo] = useState({})
+  const [userCardInfo, setUserCardInfo] = useState([]);
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState("");
   
@@ -23,12 +23,18 @@ const Welcome = () => {
   const getUserInfo = () => {
     const currCookie = new Cookies()
     const userID = currCookie.get("userID")
+    const userName = currCookie.get("username")
+    const password = currCookie.get("password")
     if (userID) {
-      const userURL = "http://10.130.228.66:9091/users" + userID.toString()
+      const userURL = "http://10.130.228.66:9091/api/v1/users/" + userID.toString()
       setIsError(false);
 
       axios({
         method: "GET",
+        auth: {
+          username: userName,
+          password: password
+        },
         url: userURL,
       })
         .then(response => {
@@ -36,13 +42,18 @@ const Welcome = () => {
           console.log(respData)
           
           if (respData) {
-            setUserInfo(respData);
+            setUserCardInfo(respData);
           }
         })
         .catch(function(error) {
-          const errorMsg = error.message;
-          if (errorMsg) {
+          const errorResp = error.response;
+          const errorRespData = errorResp.data;
+          let errorMsg:string;
+          if (errorRespData.message) {
+            errorMsg = errorRespData.message
             setError(errorMsg);
+          } else {
+            setError(errorRespData);
           }
           setIsError(true);
         });
@@ -52,19 +63,18 @@ const Welcome = () => {
     }
   };
 
-  const renderUserInfo = () => {
-    if (userInfo) {
-      Object.keys(userInfo).map(function(key, index) {
-        return (
-          <Card
-              style={{ marginTop: 16 }}
-              type="inner"
-              title="Inner Card title"
-            >
-              userInfo.key
-          </Card>
-        )
-      });
+  const renderInfo = (infor:any) => {
+    if (infor) {      
+      return (
+        <Card
+            style={{ marginTop: 16 }}
+            type="inner"
+            title={infor}
+            key={infor}
+          >
+            {userCardInfo[infor]}
+        </Card>
+      )     
     }
   }
 
@@ -76,27 +86,13 @@ const Welcome = () => {
             <img src={SAPLogo} className="welcomeLogo" />
             <span className="systemTitle">Welcome S+ POC</span>          
           </div>
-          <div className="userInfo">
-          <Card title="User Info" style={{ width: 300 }}>
-            <p className="site-card-demo-inner-p">User</p>
+          <div className="userInfo">            
             {isError ? (
-              <Card
-              style={{ marginTop: 16 }}
-              type="inner"
-              title="Inner Card title"
-            >
-              {error}
-            </Card>
+              <span style={{ color: "#ff4d4f" }}>{error}</span>
             ) : (
-              <Card
-              style={{ marginTop: 16 }}
-              type="inner"
-              title="User"
-            >
-              {renderUserInfo}
-            </Card>
+              Object.keys(userCardInfo).map(renderInfo)
             )}
-          </Card>
+            
           </div>
         </div>
 
