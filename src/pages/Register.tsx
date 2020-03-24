@@ -3,6 +3,10 @@ import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
 import qs from "qs";
 import { Cookies } from "react-cookie";
+import { connect } from "react-redux";
+import store from "../redux/store";
+import { setUserID } from "../redux/actions";
+
 
 import { Form, Input, Select, Checkbox, Button } from "antd";
 
@@ -10,9 +14,13 @@ import "./Register.css";
 import LoginRegister from "../layouts/LoginRegister";
 
 const { Option } = Select;
+type Props = {
+  setuserid: typeof setUserID;
+};
 
-const Register = () => {
+const Register: React.FC<Props> = props => {
   const [form] = Form.useForm();
+  let userID:Number;
 
   const [data, setData] = useState({});
   const [content, setContent] = useState({
@@ -61,14 +69,23 @@ const Register = () => {
       })
       .catch(function(error) {
         const errorResp = error.response;
-        const errorRespData = errorResp.data;
+        
         let errorMsg:string;
-        if (errorRespData.message) {
-          errorMsg = errorRespData.message
-          setRoleError(errorMsg);
+        if (errorResp) {
+          const errorRespData = errorResp.data;
+          if (errorRespData) {
+            if (errorRespData.message) {
+              errorMsg = errorRespData.message
+              setRoleError(errorMsg);
+            } else {
+              setRoleError(errorRespData);
+            }
+          }
+          
         } else {
-          setRoleError(errorRespData);
+          setRoleError(error.message);
         }
+        
         setIsRoleError(true);
       });
   }
@@ -110,7 +127,9 @@ const Register = () => {
           registerJudge = false;
         } else if (!isEmpty(respData) && isRegister === false) {
           setIsRegister(true);
-          registerJudge = true;
+          registerJudge = true;     
+          
+          userID = respData.id;
 
           // save user id to cookie
           const userIDCookie = new Cookies()
@@ -122,22 +141,41 @@ const Register = () => {
       .then(() => {
         // link to Welcome page
         if (registerJudge) {
-          const login = "http://localhost:3000/";
-          window.location.href = login;
+          setIsRegister(false);
+          registerJudge = false;
         }
       })
       .catch(function(error) {        
         const errorResp = error.response;
-        const errorRespData = errorResp.data;
+        
         let errorMsg:string;
-        if (errorRespData.message) {
-          errorMsg = errorRespData.message
-          setError(errorMsg);
+        if (errorResp) {
+          const errorRespData = errorResp.data;
+          if (errorRespData) {
+            if (errorRespData.message) {
+              errorMsg = errorRespData.message
+              setError(errorMsg);
+            } else {
+              setError(errorRespData);
+            }
+          }          
         } else {
-          setError(errorRespData);
-        }
+          setError(error.message);
+        }        
         setIsError(true);
       });
+
+      // invoke the Redux action-setUserID to set user id
+      if (userID) {
+        props.setuserid(userID);
+        console.log(store.getState());
+        userID = 0;
+
+        const login = "http://localhost:3000/";
+        window.location.href = login;
+      }
+      
+
   };
 
   const prefixSelector = (
@@ -360,4 +398,7 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default connect(
+  null,
+  { setUserID }
+)(Register);

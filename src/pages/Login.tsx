@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
 import { Cookies } from "react-cookie";
+import store from "../redux/store";
 
 import { Form, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -26,6 +27,7 @@ const Login: React.FC<Props> = props => {
   const loginCookies = new Cookies();
 
   useEffect(() => {
+    console.log(store.getState())
     if (userName !== "" && password !== "" && canLogin === true) {
       setCanLogin(false);
     } else if ((userName === "" || password === "") && canLogin === false) {
@@ -92,7 +94,7 @@ const Login: React.FC<Props> = props => {
           // set cookies
           const authorities = respData.authorites;
           const userID = respData.id;
-          loginCookies.set("username", userName, { path: "/" });
+          loginCookies.set("username", userName, { path: "/", httpOnly:true });
           loginCookies.set("password", password, { path: "/" });
           loginCookies.set("permissions", authorities, { path: "/" })
           loginCookies.set("userID", userID, { path: "/" })
@@ -107,14 +109,22 @@ const Login: React.FC<Props> = props => {
       })
       .catch(function(error) {
         const errorResp = error.response;
-        const errorRespData = errorResp.data;
+        
         let errorMsg:string;
-        if (errorRespData.message) {
-          errorMsg = errorRespData.message
-          setError(errorMsg);
+        if (errorResp) {
+          const errorRespData = errorResp.data;
+          if (errorRespData) {
+            if (errorRespData.message) {
+              errorMsg = errorRespData.message
+              setError(errorMsg);
+            } else {
+              setError(errorRespData);
+            }
+          }          
         } else {
-          setError(errorRespData);
+          setError(error.message);
         }
+        
         setIsError(true);
       });
   };

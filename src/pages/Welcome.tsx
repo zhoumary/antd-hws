@@ -47,14 +47,22 @@ const Welcome = () => {
         })
         .catch(function(error) {
           const errorResp = error.response;
-          const errorRespData = errorResp.data;
+          
           let errorMsg:string;
-          if (errorRespData.message) {
-            errorMsg = errorRespData.message
-            setError(errorMsg);
+          if (errorResp) {
+            const errorRespData = errorResp.data;
+            if (errorRespData) {
+              if (errorRespData.message) {
+                errorMsg = errorRespData.message
+                setError(errorMsg);
+              } else {
+                setError(errorRespData);
+              }
+            }            
           } else {
-            setError(errorRespData);
+            setError(error.message);
           }
+          
           setIsError(true);
         });
     } else {

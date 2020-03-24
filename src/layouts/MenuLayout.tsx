@@ -205,14 +205,23 @@ const MenuLayout: React.FC<Props> = props => {
       })
       .catch(function(error) {
         const errorResp = error.response;
-        const errorRespData = errorResp.data;
+        
         let errorMsg:string;
-        if (errorRespData.message) {
-          errorMsg = errorRespData.message
-          message.error("menu" + errorMsg);
+        if (errorResp) {
+          const errorRespData = errorResp.data;
+          if (errorRespData) {
+            if (errorRespData.message) {
+              errorMsg = errorRespData.message
+              message.error("menu" + errorMsg);
+            } else {
+              message.error("menu" + errorRespData);
+            }
+          }          
         } else {
-          message.error("menu" + errorRespData);
+          message.error(error.message);
         }
+
+        
         setIsMenuError(true);
       });
   };
@@ -247,14 +256,24 @@ const MenuLayout: React.FC<Props> = props => {
       })
       .catch(function(error) {
         const errorResp = error.response;
-        const errorRespData = errorResp.data;
+        
         let errorMsg:string;
-        if (errorRespData.message) {
-          errorMsg = errorRespData.message
-          message.error("logout" + errorMsg);
+
+        if (errorResp) {
+          const errorRespData = errorResp.data;
+          if (errorRespData) {
+            if (errorRespData.message) {
+              errorMsg = errorRespData.message
+              message.error("logout " + errorMsg);
+            } else {
+              message.error("logout " + errorRespData);
+            }
+          }          
         } else {
-          message.error("logout" + errorRespData);
+          message.error("logout " + error.message);
         }
+
+        
         setIsLogoutError(true);
       });
 
