@@ -15,7 +15,7 @@ import LoginRegister from "../layouts/LoginRegister";
 
 const { Option } = Select;
 type Props = {
-  setuserid: typeof setUserID;
+  setUserID: typeof setUserID;
 };
 
 const Register: React.FC<Props> = props => {
@@ -143,6 +143,16 @@ const Register: React.FC<Props> = props => {
         if (registerJudge) {
           setIsRegister(false);
           registerJudge = false;
+
+          // invoke the Redux action-setUserID to set user id
+          if (userID) {
+            props.setUserID(userID);
+            console.log(store.getState());
+            userID = 0;
+
+            // const login = "http://localhost:3000/";
+            // window.location.href = login;
+          }
         }
       })
       .catch(function(error) {        
@@ -163,17 +173,7 @@ const Register: React.FC<Props> = props => {
           setError(error.message);
         }        
         setIsError(true);
-      });
-
-      // invoke the Redux action-setUserID to set user id
-      if (userID) {
-        props.setuserid(userID);
-        console.log(store.getState());
-        userID = 0;
-
-        const login = "http://localhost:3000/";
-        window.location.href = login;
-      }
+      });   
       
 
   };

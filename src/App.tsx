@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { instanceOf } from "prop-types";
 import { Cookies, withCookies } from "react-cookie";
 
 import "./App.css";
@@ -22,7 +21,7 @@ const App = () => {
           <Route
             exact
             path="/"
-            render={() => <LoginStandard loginCookie={testCookie} />}
+            component={LoginStandard} />}
           />
           <Route exact path="/user/register" component={Register} />
           <Route exact path="/user/welcome" component={Welcome} />

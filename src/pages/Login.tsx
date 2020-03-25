@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
 import { Cookies } from "react-cookie";
+import { connect } from "react-redux";
 import store from "../redux/store";
+import { setUserID } from "../redux/actions";
 
 import { Form, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -12,10 +14,12 @@ import LoginRegister from "../layouts/LoginRegister";
 
 type Props = {
   loginCookie: Cookies;
+  setUserID: typeof setUserID;
 };
 
 const Login: React.FC<Props> = props => {
   const [form] = Form.useForm();
+  let userID:Number;
 
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +31,6 @@ const Login: React.FC<Props> = props => {
   const loginCookies = new Cookies();
 
   useEffect(() => {
-    console.log(store.getState())
     if (userName !== "" && password !== "" && canLogin === true) {
       setCanLogin(false);
     } else if ((userName === "" || password === "") && canLogin === false) {
@@ -93,18 +96,30 @@ const Login: React.FC<Props> = props => {
 
           // set cookies
           const authorities = respData.authorites;
-          const userID = respData.id;
+          userID = respData.id;
+          console.log(userID);
+
           loginCookies.set("username", userName, { path: "/", httpOnly:true });
           loginCookies.set("password", password, { path: "/" });
-          loginCookies.set("permissions", authorities, { path: "/" })
-          loginCookies.set("userID", userID, { path: "/" })
+          loginCookies.set("permissions", authorities, { path: "/" });
+          loginCookies.set("userID", userID, { path: "/" });
         }
       })
       .then(() => {
         // link to Welcome page
         if (loginJudge) {
-          const welcome = window.location.href + "user/welcome";
-          window.location.href = welcome;
+          setIsLogin(false);
+          loginJudge = false;
+
+          // invoke the Redux action-setUserID to set user id
+          if (userID) {
+            props.setUserID({currUserID: userID});
+            console.log(store.getState());
+            userID = 0;
+
+            const welcome = window.location.href + "user/welcome";
+            window.location.href = welcome;
+          }
         }
       })
       .catch(function(error) {
@@ -127,6 +142,8 @@ const Login: React.FC<Props> = props => {
         
         setIsError(true);
       });
+
+      
   };
 
   return (
@@ -217,4 +234,8 @@ const Login: React.FC<Props> = props => {
   );
 };
 
-export default Login;
+export default connect(
+  null,
+  { setUserID }
+)(Login);
+
