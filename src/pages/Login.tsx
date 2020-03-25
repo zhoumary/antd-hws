@@ -3,8 +3,8 @@ import { BrowserRouter as Router } from "react-router-dom";
 import axios from "axios";
 import { Cookies } from "react-cookie";
 import { connect } from "react-redux";
-import store from "../redux/store";
-import { setUserID } from "../redux/actions";
+import store from "../redux-ts/store";
+import { setUserInfo, setUserPermissions } from "../redux-ts/actions";
 
 import { Form, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -14,12 +14,16 @@ import LoginRegister from "../layouts/LoginRegister";
 
 type Props = {
   loginCookie: Cookies;
-  setUserID: typeof setUserID;
+  setUserInfo: typeof setUserInfo;
+  setUserPermissions: typeof setUserPermissions;
 };
 
 const Login: React.FC<Props> = props => {
   const [form] = Form.useForm();
-  let userID:Number;
+  let userid:number;
+  let username:string;
+  let userkey:string;
+  let permissions:string[];
 
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -95,14 +99,17 @@ const Login: React.FC<Props> = props => {
           loginJudge = true;
 
           // set cookies
-          const authorities = respData.authorites;
-          userID = respData.id;
-          console.log(userID);
+          const authorities = respData.authorities;
+          const userId = respData.id;
+          userid = userId;
+          username = userName;
+          userkey = password;
+          permissions = authorities;
 
           loginCookies.set("username", userName, { path: "/", httpOnly:true });
           loginCookies.set("password", password, { path: "/" });
           loginCookies.set("permissions", authorities, { path: "/" });
-          loginCookies.set("userID", userID, { path: "/" });
+          loginCookies.set("userID", userId, { path: "/" });
         }
       })
       .then(() => {
@@ -111,11 +118,20 @@ const Login: React.FC<Props> = props => {
           setIsLogin(false);
           loginJudge = false;
 
-          // invoke the Redux action-setUserID to set user id
-          if (userID) {
-            props.setUserID({currUserID: userID});
+          // invoke the Redux action-setUserInfo to set user information
+          if (userid && username && userkey) {
+            props.setUserInfo({
+              userID: userid,
+              userName: username,
+              password: userkey
+            });
+            props.setUserPermissions({
+              permissions: permissions
+            })
             console.log(store.getState());
-            userID = 0;
+            userid = 0;
+            username = "";
+            userkey = "";
 
             const welcome = window.location.href + "user/welcome";
             window.location.href = welcome;
@@ -236,6 +252,6 @@ const Login: React.FC<Props> = props => {
 
 export default connect(
   null,
-  { setUserID }
+  { setUserInfo, setUserPermissions }
 )(Login);
 

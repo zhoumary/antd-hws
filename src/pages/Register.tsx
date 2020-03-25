@@ -4,8 +4,8 @@ import axios from "axios";
 import qs from "qs";
 import { Cookies } from "react-cookie";
 import { connect } from "react-redux";
-import store from "../redux/store";
-import { setUserID } from "../redux/actions";
+import store from "../redux-ts/store";
+import { setUserInfo } from "../redux-ts/actions";
 
 
 import { Form, Input, Select, Checkbox, Button } from "antd";
@@ -15,12 +15,14 @@ import LoginRegister from "../layouts/LoginRegister";
 
 const { Option } = Select;
 type Props = {
-  setUserID: typeof setUserID;
+  setUserInfo: typeof setUserInfo;
 };
 
 const Register: React.FC<Props> = props => {
   const [form] = Form.useForm();
-  let userID:Number;
+  let userid:number;
+  let username:string;
+  let userkey:string;
 
   const [data, setData] = useState({});
   const [content, setContent] = useState({
@@ -129,7 +131,9 @@ const Register: React.FC<Props> = props => {
           setIsRegister(true);
           registerJudge = true;     
           
-          userID = respData.id;
+          userid = respData.id;
+          username = content.email;
+          userkey = content.password;
 
           // save user id to cookie
           const userIDCookie = new Cookies()
@@ -145,10 +149,16 @@ const Register: React.FC<Props> = props => {
           registerJudge = false;
 
           // invoke the Redux action-setUserID to set user id
-          if (userID) {
-            props.setUserID(userID);
+          if (userid && username && userkey) {
+            props.setUserInfo({
+              userID: userid,
+              userName: username,
+              password: userkey
+            });
             console.log(store.getState());
-            userID = 0;
+            userid = 0;
+            username = "";
+            userkey = "";
 
             // const login = "http://localhost:3000/";
             // window.location.href = login;
@@ -400,5 +410,5 @@ const Register: React.FC<Props> = props => {
 
 export default connect(
   null,
-  { setUserID }
+  { setUserInfo }
 )(Register);
