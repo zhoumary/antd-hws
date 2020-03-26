@@ -4,6 +4,7 @@
 import axios from "axios";
 import { Cookies } from "react-cookie";
 import { notification } from 'antd';
+import {host} from '../utils/ApiURL';
 
 const codeMessage: {
     [index: number]: { message: string }
@@ -29,65 +30,87 @@ const codeMessage: {
 /**
  * error handler
  */
-export const errorHandler = (error:any) => {
+const errorHandler = (error:any) => {        
+    let errorMsg:{
+        message: string;
+        isError: boolean;
+    } = {
+        message: "",
+        isError: false
+    };
+
     const errorResp = error.response;
-        
-    let errorMsg:string;
     if (errorResp) {
       const errorRespData = errorResp.data;
       if (errorRespData) {
         if (errorRespData.message) {
-          errorMsg = errorRespData.message
+            errorMsg.message = errorRespData.message;
+            errorMsg.isError = true;
         } else {
-            errorMsg = errorRespData;
+            errorMsg.message = errorRespData;
+            errorMsg.isError = true;
         }
         return errorMsg;
       }          
     } else {
-        errorMsg = error.message;
+        errorMsg.message = error.message;
+        errorMsg.isError = true;
         return errorMsg;
     }    
 };
 
 
 /**
- * 配置request请求时的默认参数
+ * Create an Axios Client with defaults
  */
-/**
- *  接口请求数据时执行的方法
- *  接受参数为请求的路径apiUrl、请求接口配置参数configObj
- */
+const client = axios.create({
+    baseURL: host
+});
 
-export const request = (method:string, url:string, headers:object, data:object) => {
-    switch (method) {
-        case "POST":
-            // POST
-            axios({
-                url: url,
-                method: method,
-                headers: headers,
-                data: data
-            })
-                .then(response => {
-                    return response
-                })
-                .catch((error) => {
-                    return errorHandler(error);
-                })           
-    
-        default:
-            return notification.info({
-                message: 'Not a network request',
-                description:
-                    'This is not a network request!',
-            });
+
+/**
+ * Request Wrapper with default success/error actions
+ */
+const request = function(options:any) {
+    let respError:{
+        message: string;
+        isError: boolean;
+    } | undefined = {
+        message: "",
+        isError: false
+    }
+
+    let returnData:{
+        responseData:object;
+        errorMessage:string;
+    } = {
+        responseData:{},
+        errorMessage:""
     }
     
+    const onSuccess = function(response:any) {      
+        const rdata = response.data;
+        console.debug(rdata);
 
-
-    
+        return Promise.resolve(rdata);
+    }
+  
+    const onError = function(error:any) {
+        console.error('Request Failed:', error);
+  
+        respError = errorHandler(error);
+        if (respError != undefined) {
+            returnData.errorMessage = respError.message;
+        }
+  
+        return Promise.reject(returnData.errorMessage);
+    }
+  
+    return client(options)
+              .then(onSuccess)
+              .catch(onError);
 }
 
-
+export {request}
 
 

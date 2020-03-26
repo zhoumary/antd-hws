@@ -5,8 +5,9 @@ import { Cookies } from "react-cookie";
 import { connect } from "react-redux";
 import store from "../redux-ts/store";
 import { setUserInfo, setUserPermissions } from "../redux-ts/actions";
+import Services from '../services/login';
 
-import { Form, Input, Button, Checkbox } from "antd";
+import { Form, Input, Button, notification, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 import "./Login.css";
@@ -78,86 +79,67 @@ const Login: React.FC<Props> = props => {
     let bodyFormData = new FormData();
     bodyFormData.append("username", userName);
     bodyFormData.append("password", password);
-    
-    axios({
-      method: "POST",
-      url: "http://10.130.228.66:9091/login",
-      headers: {
-        "content-type": "multipart/form-data"
-      },      
-      data: bodyFormData,
-      withCredentials: false,
-    })
-      .then(response => {
-        console.log(response)
-        const respData = response.data;
-        if (isEmpty(respData) && isLogin === true) {
-          setIsLogin(false);
-          loginJudge = false;
-        } else if (!isEmpty(respData) && isLogin === false) {
-          setIsLogin(true);
-          loginJudge = true;
+    console.log(bodyFormData);
 
-          // set cookies
-          const authorities = respData.authorities;
-          const userId = respData.id;
-          userid = userId;
-          username = userName;
-          userkey = password;
-          permissions = authorities;
+    // invoke the request from utils
+    Services
+      .login(bodyFormData)
+      .then((response) => {
+        console.log(response);
+        if (response) {
+          const authorities = response.authorities;
+          const userId = response.id;
+          if (!(userId) && isLogin === true) {
+            setIsLogin(false);
+            loginJudge = false;
+          } else if (userId && isLogin === false) {
+            setIsLogin(true);
+            loginJudge = true;
+        
 
-          loginCookies.set("username", userName, { path: "/", httpOnly:true });
-          loginCookies.set("password", password, { path: "/" });
-          loginCookies.set("permissions", authorities, { path: "/" });
-          loginCookies.set("userID", userId, { path: "/" });
-        }
-      })
-      .then(() => {
-        // link to Welcome page
-        if (loginJudge) {
-          setIsLogin(false);
-          loginJudge = false;
+            /*
+              set cookies and store
+            */            
+            userid = userId;
+            username = userName;
+            userkey = password;
+            permissions = authorities;
+            
 
-          // invoke the Redux action-setUserInfo to set user information
-          if (userid && username && userkey) {
-            props.setUserInfo({
-              userID: userid,
-              userName: username,
-              password: userkey
-            });
-            props.setUserPermissions({
-              permissions: permissions
-            })
-            console.log(store.getState());
-            userid = 0;
-            username = "";
-            userkey = "";
+            // invoke the Redux action-setUserInfo to set user information
+            if (userid && username && userkey) {
+              loginCookies.set("username", userName, { path: "/", httpOnly:true });
+              loginCookies.set("userID", userId, { path: "/" });
+              
+              props.setUserInfo({
+                userID: userid,
+                userName: username,
+                password: userkey
+              });
+              props.setUserPermissions({
+                permissions: permissions
+              })
+              console.log(store.getState());
 
-            const welcome = window.location.href + "user/welcome";
-            window.location.href = welcome;
+              userid = 0;
+              username = "";
+              userkey = "";
+              permissions = [];
+
+              setIsLogin(false);
+              loginJudge = false;
+
+              const welcome = window.location.href + "user/welcome";
+              window.location.href = welcome;
+            }
           }
         }
       })
-      .catch(function(error) {
-        const errorResp = error.response;
-        
-        let errorMsg:string;
-        if (errorResp) {
-          const errorRespData = errorResp.data;
-          if (errorRespData) {
-            if (errorRespData.message) {
-              errorMsg = errorRespData.message
-              setError(errorMsg);
-            } else {
-              setError(errorRespData);
-            }
-          }          
-        } else {
-          setError(error.message);
-        }
-        
+      .catch((error) => {
+        console.log(error);
+        setError(error);
         setIsError(true);
-      });
+      })
 
       
   };

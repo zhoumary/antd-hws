@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Link } from "react-router-dom";
 import {Cookies} from "react-cookie";
 import axios from "axios";
+import {getUser} from '../services/getUser';
 
 import {Card} from 'antd';
 
@@ -29,42 +30,53 @@ const Welcome = () => {
       const userURL = "http://10.130.228.66:9091/api/v1/users/" + userID.toString()
       setIsError(false);
 
-      axios({
-        method: "GET",
-        auth: {
-          username: userName,
-          password: password
-        },
-        url: userURL,
-      })
-        .then(response => {
-          const respData = response.data;
-          console.log(respData)
-          
-          if (respData) {
-            setUserCardInfo(respData);
+      getUser(userName, password, userID)
+        .then((response) => {
+          if (response) {
+            setUserCardInfo(response);
           }
         })
-        .catch(function(error) {
-          const errorResp = error.response;
-          
-          let errorMsg:string;
-          if (errorResp) {
-            const errorRespData = errorResp.data;
-            if (errorRespData) {
-              if (errorRespData.message) {
-                errorMsg = errorRespData.message
-                setError(errorMsg);
-              } else {
-                setError(errorRespData);
-              }
-            }            
-          } else {
-            setError(error.message);
-          }
-          
+        .catch((error) => {
+          setError(error);
           setIsError(true);
-        });
+        })
+
+      // axios({
+      //   method: "GET",
+      //   auth: {
+      //     username: userName,
+      //     password: password
+      //   },
+      //   url: userURL,
+      // })
+      //   .then(response => {
+      //     const respData = response.data;
+      //     console.log(respData)
+          
+      //     if (respData) {
+      //       setUserCardInfo(respData);
+      //     }
+      //   })
+      //   .catch(function(error) {
+      //     const errorResp = error.response;
+          
+      //     let errorMsg:string;
+      //     if (errorResp) {
+      //       const errorRespData = errorResp.data;
+      //       if (errorRespData) {
+      //         if (errorRespData.message) {
+      //           errorMsg = errorRespData.message
+      //           setError(errorMsg);
+      //         } else {
+      //           setError(errorRespData);
+      //         }
+      //       }            
+      //     } else {
+      //       setError(error.message);
+      //     }
+          
+      //     setIsError(true);
+      //   });
     } else {
       setIsError(true);
       setError("The user information is incomplete.")

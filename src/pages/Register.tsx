@@ -6,6 +6,8 @@ import { Cookies } from "react-cookie";
 import { connect } from "react-redux";
 import store from "../redux-ts/store";
 import { setUserInfo } from "../redux-ts/actions";
+import {getRoles} from '../services/getRoles';
+import {register} from '../services/register';
 
 
 import { Form, Input, Select, Checkbox, Button } from "antd";
@@ -56,40 +58,18 @@ const Register: React.FC<Props> = props => {
 
   const getAllRoles = () => {
     setIsRoleError(false);
-    
-    axios({
-      method: "GET",
-      url: "http://10.130.228.66:9091/api/v1/roles",
-    })
-      .then(response => {
-        const respData = response.data;
-        console.log(respData)
-        setData(respData);
-        if (!isEmpty(respData)) {
-          setallRoles(respData);
+
+    getRoles()
+      .then((response) => {
+        console.log(response)
+        if (response) {
+          setallRoles(response);
         }
       })
-      .catch(function(error) {
-        const errorResp = error.response;
-        
-        let errorMsg:string;
-        if (errorResp) {
-          const errorRespData = errorResp.data;
-          if (errorRespData) {
-            if (errorRespData.message) {
-              errorMsg = errorRespData.message
-              setRoleError(errorMsg);
-            } else {
-              setRoleError(errorRespData);
-            }
-          }
-          
-        } else {
-          setRoleError(error.message);
-        }
-        
+      .catch((error) => {
+        setRoleError(error);
         setIsRoleError(true);
-      });
+      })
   }
 
   const loadRolesDesc = (eachRole:any) => {
@@ -113,77 +93,125 @@ const Register: React.FC<Props> = props => {
     let testContent = qs.stringify(content)
     console.log(testContent);
 
-    axios({
-      method: "POST",
-      url: "http://10.130.228.66:9091/api/v1/users/register",
-      headers: {
-        "content-type": "application/json"
-      },
-      data: content
-    })
-      .then(response => {
-        const respData = response.data;
-        setData(respData);
-        if (isEmpty(respData) && isRegister === true) {
-          setIsRegister(false);
-          registerJudge = false;
-        } else if (!isEmpty(respData) && isRegister === false) {
-          setIsRegister(true);
-          registerJudge = true;     
-          
-          userid = respData.id;
-          username = content.email;
-          userkey = content.password;
+    register(content)
+      .then((response) => {
+        if (response) {
+          setData(response);
+          if (response && isRegister === false) {
+            setIsRegister(true);
+            registerJudge = true;     
+            
+            userid = response.id;
+            username = content.email;
+            userkey = content.password;
+  
+            // save user id to cookie
+            const userIDCookie = new Cookies()
+            userIDCookie.set("userID", userid, { path: "/" })
+            userIDCookie.set("username", username, { path: "/" })
 
-          // save user id to cookie
-          const userIDCookie = new Cookies()
-          userIDCookie.set("userID", respData.id, { path: "/" })
-          userIDCookie.set("username", content.email, { path: "/" })
-          userIDCookie.set("password", content.password, { path: "/" })
-        }
-      })
-      .then(() => {
-        // link to Welcome page
-        if (registerJudge) {
-          setIsRegister(false);
-          registerJudge = false;
+            // invoke the Redux action-setUserID to set user id
+            if (userid && username && userkey) {
+              props.setUserInfo({
+                userID: userid,
+                userName: username,
+                password: userkey
+              });
+              console.log(store.getState());
+              userid = 0;
+              username = "";
+              userkey = "";
 
-          // invoke the Redux action-setUserID to set user id
-          if (userid && username && userkey) {
-            props.setUserInfo({
-              userID: userid,
-              userName: username,
-              password: userkey
-            });
-            console.log(store.getState());
-            userid = 0;
-            username = "";
-            userkey = "";
+              setIsRegister(false);
+              registerJudge = false;
 
-            // const login = "http://localhost:3000/";
-            // window.location.href = login;
-          }
-        }
-      })
-      .catch(function(error) {        
-        const errorResp = error.response;
-        
-        let errorMsg:string;
-        if (errorResp) {
-          const errorRespData = errorResp.data;
-          if (errorRespData) {
-            if (errorRespData.message) {
-              errorMsg = errorRespData.message
-              setError(errorMsg);
-            } else {
-              setError(errorRespData);
+              // const login = "http://localhost:3000/";
+              // window.location.href = login;
             }
-          }          
-        } else {
-          setError(error.message);
-        }        
+          } else {
+            if (isRegister === true) {
+              setIsRegister(false);
+              registerJudge = false;
+            }
+          }
+        }       
+      })
+      .catch((error) => {
+        setError(error);
         setIsError(true);
-      });   
+      })
+
+    // axios({
+    //   method: "POST",
+    //   url: "http://10.130.228.66:9091/api/v1/users/register",
+    //   headers: {
+    //     "content-type": "application/json"
+    //   },
+    //   data: content
+    // })
+    //   .then(response => {
+    //     const respData = response.data;
+    //     setData(respData);
+    //     if (isEmpty(respData) && isRegister === true) {
+    //       setIsRegister(false);
+    //       registerJudge = false;
+    //     } else if (!isEmpty(respData) && isRegister === false) {
+    //       setIsRegister(true);
+    //       registerJudge = true;     
+          
+    //       userid = respData.id;
+    //       username = content.email;
+    //       userkey = content.password;
+
+    //       // save user id to cookie
+    //       const userIDCookie = new Cookies()
+    //       userIDCookie.set("userID", respData.id, { path: "/" })
+    //       userIDCookie.set("username", content.email, { path: "/" })
+    //       userIDCookie.set("password", content.password, { path: "/" })
+    //     }
+    //   })
+    //   .then(() => {
+    //     // link to Welcome page
+    //     if (registerJudge) {
+    //       setIsRegister(false);
+    //       registerJudge = false;
+
+    //       // invoke the Redux action-setUserID to set user id
+    //       if (userid && username && userkey) {
+    //         props.setUserInfo({
+    //           userID: userid,
+    //           userName: username,
+    //           password: userkey
+    //         });
+    //         console.log(store.getState());
+    //         userid = 0;
+    //         username = "";
+    //         userkey = "";
+
+    //         // const login = "http://localhost:3000/";
+    //         // window.location.href = login;
+    //       }
+    //     }
+    //   })
+    //   .catch(function(error) {        
+    //     const errorResp = error.response;
+        
+    //     let errorMsg:string;
+    //     if (errorResp) {
+    //       const errorRespData = errorResp.data;
+    //       if (errorRespData) {
+    //         if (errorRespData.message) {
+    //           errorMsg = errorRespData.message
+    //           setError(errorMsg);
+    //         } else {
+    //           setError(errorRespData);
+    //         }
+    //       }          
+    //     } else {
+    //       setError(error.message);
+    //     }        
+    //     setIsError(true);
+    //   });   
       
 
   };
