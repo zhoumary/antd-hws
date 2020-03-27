@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
-import axios from "axios";
 import { Cookies } from "react-cookie";
 import { connect } from "react-redux";
 import store from "../redux-ts/store";
 import { setUserInfo, setUserPermissions } from "../redux-ts/actions";
 import Services from '../services/login';
 
-import { Form, Input, Button, notification, Checkbox } from "antd";
+import { Form, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 import "./Login.css";
@@ -74,7 +73,6 @@ const Login: React.FC<Props> = props => {
 
   const callLogin = () => {
     setIsError(false);
-    let loginJudge: boolean = false;
 
     let bodyFormData = new FormData();
     bodyFormData.append("username", userName);
@@ -91,10 +89,8 @@ const Login: React.FC<Props> = props => {
           const userId = response.id;
           if (!(userId) && isLogin === true) {
             setIsLogin(false);
-            loginJudge = false;
           } else if (userId && isLogin === false) {
             setIsLogin(true);
-            loginJudge = true;
         
 
             /*
@@ -127,7 +123,6 @@ const Login: React.FC<Props> = props => {
               permissions = [];
 
               setIsLogin(false);
-              loginJudge = false;
 
               const welcome = window.location.href + "user/welcome";
               window.location.href = welcome;

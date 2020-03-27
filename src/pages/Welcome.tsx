@@ -27,7 +27,6 @@ const Welcome = () => {
     const userName = currCookie.get("username")
     const password = currCookie.get("password")
     if (userID) {
-      const userURL = "http://10.130.228.66:9091/api/v1/users/" + userID.toString()
       setIsError(false);
 
       getUser(userName, password, userID)
@@ -40,43 +39,6 @@ const Welcome = () => {
           setError(error);
           setIsError(true);
         })
-
-      // axios({
-      //   method: "GET",
-      //   auth: {
-      //     username: userName,
-      //     password: password
-      //   },
-      //   url: userURL,
-      // })
-      //   .then(response => {
-      //     const respData = response.data;
-      //     console.log(respData)
-          
-      //     if (respData) {
-      //       setUserCardInfo(respData);
-      //     }
-      //   })
-      //   .catch(function(error) {
-      //     const errorResp = error.response;
-          
-      //     let errorMsg:string;
-      //     if (errorResp) {
-      //       const errorRespData = errorResp.data;
-      //       if (errorRespData) {
-      //         if (errorRespData.message) {
-      //           errorMsg = errorRespData.message
-      //           setError(errorMsg);
-      //         } else {
-      //           setError(errorRespData);
-      //         }
-      //       }            
-      //     } else {
-      //       setError(error.message);
-      //     }
-          
-      //     setIsError(true);
-      //   });
     } else {
       setIsError(true);
       setError("The user information is incomplete.")

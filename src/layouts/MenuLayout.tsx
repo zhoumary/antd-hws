@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Cookies } from "react-cookie";
-import Login from "../pages/Login";
+import Services from '../services/login';
 
-import { Layout, message, Menu, Breadcrumb, Dropdown, Alert } from "antd";
+import { Layout, message, Menu, Breadcrumb, Dropdown } from "antd";
 import {
   UserOutlined,
-  LaptopOutlined,
-  NotificationOutlined
 } from "@ant-design/icons";
 
 import "./MenuLayout.css";
@@ -26,12 +24,8 @@ const MenuLayout: React.FC<Props> = props => {
 
   const currCookie = new Cookies();
 
-  const [data, setData] = useState({});
-  const [isLogoutError, setIsLogoutError] = useState(false);
-  const [isMenuError, setIsMenuError] = useState(false);
-
   const onClick = ({ key = "" }) => {
-    if (key == "3") {
+    if (key === "3") {
       return;
     }
 
@@ -58,10 +52,10 @@ const MenuLayout: React.FC<Props> = props => {
   }
 
   const renderSubMenus = (subMenus: any) => {
-    if (subMenus.length == 1) {
+    if (subMenus.length === 1) {
       // judge its subMenus count
       let menuItems:any = [];
-      if (subMenus[0].subMenus.length == 0) {
+      if (subMenus[0].subMenus.length === 0) {
         menuItems.push(<Menu.Item key={subMenus[0].code}>{subMenus[0].name}</Menu.Item>)
       } else if (subMenus[0].subMenus.length >= 1) {  
         menuItems.push(renderMenuItems(subMenus[0]))
@@ -73,7 +67,7 @@ const MenuLayout: React.FC<Props> = props => {
       let menuItems:any = [];
       subMenus.map((subMenu:any) => {
         // judge its subMenus count
-        if (subMenu.subMenus.length == 0) {
+        if (subMenu.subMenus.length === 0) {
           menuItems.push(<Menu.Item key={subMenu.code}>{subMenu.name}</Menu.Item>)
         } else if (subMenu.subMenus.length >= 1) {
           menuItems.push(renderMenuItems(subMenu))
@@ -82,7 +76,7 @@ const MenuLayout: React.FC<Props> = props => {
       if (menuItems) {
         return menuItems 
       }          
-    } else if (subMenus.length == 0) {
+    } else if (subMenus.length === 0) {
       return 
     }
   }
@@ -179,7 +173,6 @@ const MenuLayout: React.FC<Props> = props => {
   }]
 
   const renderMenu = () => {
-    setIsMenuError(false);
     
     const userIDCookie = new Cookies();
     const cookieID = userIDCookie.get("userID");
@@ -220,33 +213,20 @@ const MenuLayout: React.FC<Props> = props => {
         } else {
           message.error(error.message);
         }
-
-        
-        setIsMenuError(true);
       });
   };
 
   const logout = () => {
-    setIsLogoutError(false);
     
     let bodyFormData = new FormData();
     bodyFormData.append("username", currCookie.get("username"));
     bodyFormData.append("password", currCookie.get("password"));
 
-    axios({
-      method: "POST",
-      url: "http://10.130.228.66:9091/logout",
-      headers: {
-        "content-type": "multipart/form-data"
-      },      
-      data: bodyFormData,
-      withCredentials: false,
-    })
-      .then(response => {
-        const respData = response.status;
-        console.log(respData)
-        setData(respData);
-        if (respData == 200) {
+    Services
+      .logout(bodyFormData)
+      .then((response) => {
+        const respStatus = response.status;
+        if (respStatus === 200) {
           message.success("Logout Succeed!");
           
           // go to login page
@@ -254,30 +234,9 @@ const MenuLayout: React.FC<Props> = props => {
           window.location.href = loginPage;
         }
       })
-      .catch(function(error) {
-        const errorResp = error.response;
-        
-        let errorMsg:string;
-
-        if (errorResp) {
-          const errorRespData = errorResp.data;
-          if (errorRespData) {
-            if (errorRespData.message) {
-              errorMsg = errorRespData.message
-              message.error("logout " + errorMsg);
-            } else {
-              message.error("logout " + errorRespData);
-            }
-          }          
-        } else {
-          message.error("logout " + error.message);
-        }
-
-        
-        setIsLogoutError(true);
-      });
-
-
+      .catch((error) => {
+        message.error("logout " + error);
+      })
   }
 
   const userMenu = (
