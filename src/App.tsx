@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { lazy } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Cookies, withCookies } from "react-cookie";
 
@@ -15,27 +15,25 @@ let testCookie = new Cookies();
 
 const App = () => {
   return (
-    <Router>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Switch>
-          <Route
-            exact
-            path="/"
-            component={LoginStandard} />}
-          />
-          <Route exact path="/user/register" component={Register} />
-          <Route exact path="/user/welcome" component={Welcome} />
+    <Router>      
+      <Switch>
+        <Route
+          exact
+          path="/"
+          component={LoginStandard} />}
+        />
+        <Route exact path="/user/register" component={Register} />
+        <Route exact path="/user/welcome" component={Welcome} />
 
-          <Route exact path="/user" component={MenuLayout} />
-          <Route
-            exact
-            path="/loginRegister"
-            render={() => (
-              <LoginRegister cookie={testCookie} children={<div></div>} />
-            )}
-          />
-        </Switch>
-      </Suspense>
+        <Route exact path="/user" component={MenuLayout} />
+        <Route
+          exact
+          path="/loginRegister"
+          render={() => (
+            <LoginRegister cookie={testCookie} children={<div></div>} />
+          )}
+        />
+      </Switch>
     </Router>
   );
 };

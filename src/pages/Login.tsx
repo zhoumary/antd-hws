@@ -8,6 +8,7 @@ import Services from '../services/login';
 
 import { Form, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { useTranslation } from 'react-i18next';
 
 import "./Login.css";
 import LoginRegister from "../layouts/LoginRegister";
@@ -19,7 +20,9 @@ type Props = {
 };
 
 const Login: React.FC<Props> = props => {
+  const { t, i18n } = useTranslation();  
   const [form] = Form.useForm();
+
   let userid:number;
   let username:string;
   let userkey:string;
@@ -58,13 +61,6 @@ const Login: React.FC<Props> = props => {
     const newValue = e.currentTarget.value;
     setPassword(newValue);
   };
-
-  function isEmpty(obj: Object) {
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) return false;
-    }
-    return true;
-  }
 
   const login = (event: {}) => {
     // call API to verify the Username and Password
@@ -164,7 +160,7 @@ const Login: React.FC<Props> = props => {
             >
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Username"
+                placeholder={t('username.1')}
                 value="username"
                 onChange={nameChange}
               />
@@ -184,18 +180,18 @@ const Login: React.FC<Props> = props => {
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 value="password"
-                placeholder="Password"
+                placeholder={t('password.1')}
                 onChange={passwordChange}
               />
             </Form.Item>
 
             <Form.Item>
               <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>Remember me</Checkbox>
+                <Checkbox>{t('remember.1')}</Checkbox>
               </Form.Item>
 
               <a className="login-form-forgot" href="">
-                Forgot password
+              {t('forgot.1')}
               </a>
             </Form.Item>
 
@@ -214,10 +210,10 @@ const Login: React.FC<Props> = props => {
                 onClick={login}
                 disabled={canLogin}
               >
-                Log in
+                {t('login.1')}
               </Button>
               <span>
-                Or <a href="/user/register">register now!</a>
+                {t('or.1')} <a href="/user/register">{t('register.1')}</a>
               </span>
             </Form.Item>
           </Form>

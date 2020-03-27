@@ -269,7 +269,8 @@ const MenuLayout: React.FC<Props> = props => {
                 className="ant-dropdown-link"
                 onClick={e => e.preventDefault()}
               >
-                {currCookie.get("username")}
+                {/* {currCookie.get("username")} */}
+                User Name
               </a>
             </Dropdown>
           </Menu.Item>

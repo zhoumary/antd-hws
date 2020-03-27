@@ -1,7 +1,9 @@
-import React from "react";
+import React, {Suspense} from "react";
 import ReactDOM from "react-dom";
 import { CookiesProvider } from "react-cookie";
 import { Provider } from 'react-redux';
+// import i18n (needs to be bundled ;)) 
+import './i18n';
 import store from "./redux-ts/store";
 
 
@@ -10,11 +12,13 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
-  <Provider store={store}>
-    <CookiesProvider>
-    <App />
-  </CookiesProvider>
-  </Provider>
+  <Suspense fallback={<div>Loading...</div>}>
+    <Provider store={store}>
+      <CookiesProvider>
+      <App />
+    </CookiesProvider>
+    </Provider>
+  </Suspense>
   ,
   document.getElementById("root")
 );
