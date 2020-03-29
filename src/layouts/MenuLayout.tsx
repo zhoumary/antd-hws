@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Cookies } from "react-cookie";
+// import { Cookies } from "react-cookie";
 
 import { Layout, message, Menu, Breadcrumb } from "antd";
 import {
@@ -19,12 +19,12 @@ type Props = {
 };
 
 const MenuLayout: React.FC<Props> = props => {
-  // const [menus, setMenus] = useState({});
+  const [menus, setMenus] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    // renderMenu();
-  }, []); 
+    renderMenu();
+  }); 
   
 
   const renderMenuItems = (menusItems: any) => { 
@@ -71,107 +71,16 @@ const MenuLayout: React.FC<Props> = props => {
     }
   }
 
-  // mock menus to render home menu
-  const mockMenus = [{
-    id: 1,      
-    code: "01",      
-    sequence: 1,      
-    name: "menu_01",      
-    subMenus: [{      
-            id: 1,      
-            code: "0101",      
-            sequence: 1,      
-            name: "menu_0101",      
-            subMenus: [{      
-              id: 1,      
-              code: "010101",      
-              sequence: 1,      
-              name: "menu_010101",      
-              subMenus: []     
-          }, {      
-            id: 2,      
-            code: "010102",      
-            sequence: 2,      
-            name: "menu_010102",      
-            subMenus: []      
-        }]     
-        }, 
-        {     
-            id: 2,      
-            code: "0102",      
-            sequence: 2,      
-            name: "menu_0102",      
-            subMenus: [{      
-              id: 1,      
-              code: "010201",      
-              sequence: 1,      
-              name: "menu_010201",      
-              subMenus: [{      
-                id: 1,      
-                code: "01020101",      
-                sequence: 1,      
-                name: "menu_01020101",      
-                subMenus: []      
-            }]      
-          }]      
-        }      
-    ]      
-  },{
-    id: 2,      
-    code: "02",      
-    sequence: 2,      
-    name: "menu_02",      
-    subMenus: [{      
-            id: 1,      
-            code: "0201",      
-            sequence: 1,      
-            name: "menu_0201",      
-            subMenus: [{      
-              id: 1,      
-              code: "020101",      
-              sequence: 1,      
-              name: "menu_020101",      
-              subMenus: []     
-          }, {      
-            id: 2,      
-            code: "010202",      
-            sequence: 2,      
-            name: "menu_010202",      
-            subMenus: []      
-        }]     
-        }, 
-        {     
-            id: 2,      
-            code: "0202",      
-            sequence: 2,      
-            name: "menu_0202",      
-            subMenus: [{      
-              id: 1,      
-              code: "020201",      
-              sequence: 1,      
-              name: "menu_020201",      
-              subMenus: [{      
-                id: 1,      
-                code: "02020101",      
-                sequence: 1,      
-                name: "menu_01020101",      
-                subMenus: []      
-            }]      
-          }]      
-        }      
-    ]      
-  }]
-
   const renderMenu = () => {
     
-    const userIDCookie = new Cookies();
-    const cookieID = userIDCookie.get("userID");
-    const queryMenuParam = "/user(" + cookieID + ")/menu";          
+    // const userIDCookie = new Cookies();
+    // const cookieID = userIDCookie.get("userID");
+    // const queryMenuParam = "/user(" + cookieID + ")/menu";          
 
     axios({
       method: "GET",
-      baseURL: "",
-      url: queryMenuParam,
+      baseURL: "http://localhost:9000/api",
+      url: "/menus",
       headers: {
         "content-type": "application/x-www-form-urlencoded"
       },
@@ -180,11 +89,8 @@ const MenuLayout: React.FC<Props> = props => {
       .then(response => {
         const respData = response.data;    
         if (respData) {
-          // setMenus(respData);
+          setMenus(respData);
         }
-      })
-      .then(() => {
-        // renderMenuItems(menus);
       })
       .catch(function(error) {
         const errorResp = error.response;
@@ -242,7 +148,7 @@ const MenuLayout: React.FC<Props> = props => {
             // defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
           >
-            {mockMenus.map(renderMenuItems)}
+            {menus.map(renderMenuItems)}
           </Menu>
         </Sider>
         <Layout style={{ padding: "0 24px 24px" }}>

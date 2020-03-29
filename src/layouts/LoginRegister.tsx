@@ -30,7 +30,7 @@ const LoginRegister: React.FC<Props> = props => {
           {props.children}
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          <span>Copyright 2020 思愛普（中國）有限公司</span>
+          <span>Copyright 2020 示愛普（中國）有限公司</span>
         </Footer>
       </Layout>
     </div>

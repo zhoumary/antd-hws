@@ -1,0 +1,45 @@
+[{
+    "id": 1,
+    "code": "01",
+    "sequence": 1,
+    "name": "menu_01",
+    "subMenus": [{
+            "id": 1,
+            "code": "0101",
+            "sequence": 1,
+            "name": "menu_0101",
+            "subMenus": [{
+                "id": 1,
+                "code": "010101",
+                "sequence": 1,
+                "name": "menu_010101",
+                "subMenus": []
+            }, {
+                "id": 2,
+                "code": "010102",
+                "sequence": 2,
+                "name": "menu_010102",
+                "subMenus": []
+            }]
+        },
+        {
+            "id": 2,
+            "code": "0102",
+            "sequence": 2,
+            "name": "menu_0102",
+            "subMenus": [{
+                "id": 1,
+                "code": "010201",
+                "sequence": 1,
+                "name": "menu_010201",
+                "subMenus": [{
+                    "id": 1,
+                    "code": "01020101",
+                    "sequence": 1,
+                    "name": "menu_01020101",
+                    "subMenus": []
+                }]
+            }]
+        }
+    ]
+}]
