@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
-import axios from "axios";
 import qs from "qs";
 import { Cookies } from "react-cookie";
 import { connect } from "react-redux";
@@ -26,7 +25,6 @@ const Register: React.FC<Props> = props => {
   let username:string;
   let userkey:string;
 
-  const [data, setData] = useState({});
   const [content, setContent] = useState({
     email: "",
     mobile: "",
@@ -82,17 +80,14 @@ const Register: React.FC<Props> = props => {
   const callRegister = () => {
     console.log(content);
     setIsError(false);
-    let registerJudge: boolean = false;
     let testContent = qs.stringify(content)
     console.log(testContent);
 
     register(content)
       .then((response) => {
         if (response) {
-          setData(response);
           if (response && isRegister === false) {
             setIsRegister(true);
-            registerJudge = true;     
             
             userid = response.id;
             username = content.email;
@@ -116,7 +111,6 @@ const Register: React.FC<Props> = props => {
               userkey = "";
 
               setIsRegister(false);
-              registerJudge = false;
 
               // const login = "http://localhost:3000/";
               // window.location.href = login;
@@ -124,7 +118,6 @@ const Register: React.FC<Props> = props => {
           } else {
             if (isRegister === true) {
               setIsRegister(false);
-              registerJudge = false;
             }
           }
         }       
@@ -145,7 +138,7 @@ const Register: React.FC<Props> = props => {
           width: 70
         }}
         onChange={e => {
-          const phonePrefix = e;
+          // const phonePrefix = e;
           // setContent({ ...content, phonePrefix: phonePrefix });
         }}
       >
@@ -329,7 +322,7 @@ const Register: React.FC<Props> = props => {
               ]}
             >
               <Checkbox>
-                I have read the <a href="">agreement</a>
+                I have read the <a href="/">agreement</a>
               </Checkbox>
             </Form.Item>
             {isError ? (

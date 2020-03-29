@@ -1,12 +1,12 @@
 import React from "react";
 import { Cookies } from "react-cookie";
 
-import { Layout, Menu, Dropdown } from "antd";
-import { useTranslation } from 'react-i18next';
+import { Layout } from "antd";
+import LanguageDropdown from '../components/HeaderDropdown/LanguageDropdown';
 
 import "./LoginRegister.css";
-import Language from "../assets/地球.svg";
 import SAPLogo from "../assets/sap.svg";
+import Logo from '../assets/pandalogo.jpg';
 
 const { Header, Footer, Content } = Layout;
 
@@ -15,45 +15,20 @@ type Props = {
   cookie: Cookies;
 };
 
-const LoginRegister: React.FC<Props> = props => {
-  const { t, i18n } = useTranslation(); 
-  
-  const onClick = ({ key = "" }) => {
-    i18n.changeLanguage(key);
-  };
-  
-  const userLanguage = (
-    <Menu onClick={onClick} style={{minWidth:"69px", left:"1321px"}}>
-      <Menu.Item key="en">English</Menu.Item>
-      <Menu.Item key="zh">Chinese</Menu.Item>
-    </Menu>
-  );
-  
-  
+const LoginRegister: React.FC<Props> = props => {  
   return (
     <div className="root">
       <Layout className="login">
         <Header className="language">
-          {/* <div className="langSetting">
-            <img src={Language} className="multiLang" />
-          </div> */}
-          <Dropdown overlay={userLanguage} className="langSetting">
-              <a
-                className="ant-dropdown-link"
-                onClick={e => e.preventDefault()}
-              >
-                <img src={Language} className="multiLang" />
-              </a>
-          </Dropdown>
+          <LanguageDropdown />
         </Header>
         <Content className="content">
           <div className="loginTitle">
-            <img src={SAPLogo} className="logo" />
+            <img src={Logo} className="logo" />
             <span className="systemTitle">S+ POC</span>
           </div>
           {props.children}
         </Content>
-
         <Footer style={{ textAlign: "center" }}>
           <span>Copyright 2020 思愛普（中國）有限公司</span>
         </Footer>

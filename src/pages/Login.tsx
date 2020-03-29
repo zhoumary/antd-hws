@@ -20,7 +20,7 @@ type Props = {
 };
 
 const Login: React.FC<Props> = props => {
-  const { t, i18n } = useTranslation();  
+  const { t } = useTranslation();  
   const [form] = Form.useForm();
 
   let userid:number;
@@ -43,7 +43,7 @@ const Login: React.FC<Props> = props => {
     } else if ((userName === "" || password === "") && canLogin === false) {
       setCanLogin(true);
     }
-  }, [userName, password]);
+  }, [userName, password, canLogin]);
 
   const onFinish = (event: {}) => {
     // if the validation succed, invoke login function
@@ -190,7 +190,7 @@ const Login: React.FC<Props> = props => {
                 <Checkbox>{t('remember.1')}</Checkbox>
               </Form.Item>
 
-              <a className="login-form-forgot" href="">
+              <a className="login-form-forgot" href={window.location.href}>
               {t('forgot.1')}
               </a>
             </Form.Item>

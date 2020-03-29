@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Link } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import {Cookies} from "react-cookie";
-import axios from "axios";
 import {getUser} from '../services/getUser';
 
 import {Card} from 'antd';
@@ -65,7 +64,7 @@ const Welcome = () => {
       <MenuLayout>
         <div>
           <div className="welcome">
-            <img src={SAPLogo} className="welcomeLogo" />
+            <img src={SAPLogo} className="welcomeLogo" alt="company logo" />
             <span className="systemTitle">Welcome S+ POC</span>          
           </div>
           <div className="userInfo">            

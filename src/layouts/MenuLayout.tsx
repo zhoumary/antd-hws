@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Cookies } from "react-cookie";
-import Services from '../services/login';
 
-import { Layout, message, Menu, Breadcrumb, Dropdown } from "antd";
+import { Layout, message, Menu, Breadcrumb } from "antd";
 import {
   UserOutlined,
 } from "@ant-design/icons";
+import LanguageDropdown from '../components/HeaderDropdown/LanguageDropdown';
+import UserDropdown from '../components/HeaderDropdown/UserDropdown';
 
 import "./MenuLayout.css";
-import Language from "../assets/地球.svg";
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -21,16 +21,6 @@ type Props = {
 const MenuLayout: React.FC<Props> = props => {
   // const [menus, setMenus] = useState({});
   const [collapsed, setCollapsed] = useState(false);
-
-  const currCookie = new Cookies();
-
-  const onClick = ({ key = "" }) => {
-    if (key === "3") {
-      return;
-    }
-
-    message.info(`Click on item ${key}`);
-  };
 
   useEffect(() => {
     // renderMenu();
@@ -216,37 +206,6 @@ const MenuLayout: React.FC<Props> = props => {
       });
   };
 
-  const logout = () => {
-    
-    let bodyFormData = new FormData();
-    bodyFormData.append("username", currCookie.get("username"));
-    bodyFormData.append("password", currCookie.get("password"));
-
-    Services
-      .logout(bodyFormData)
-      .then((response) => {
-        const respStatus = response.status;
-        if (respStatus === 200) {
-          message.success("Logout Succeed!");
-          
-          // go to login page
-          const loginPage = "http://localhost:3000/";
-          window.location.href = loginPage;
-        }
-      })
-      .catch((error) => {
-        message.error("logout " + error);
-      })
-  }
-
-  const userMenu = (
-    <Menu onClick={onClick}>
-      <Menu.Item key="1">User Center</Menu.Item>
-      <Menu.Item key="2">User Settings</Menu.Item>
-      <Menu.Item key="3" onClick={logout}>Log Out</Menu.Item>
-    </Menu>
-  );
-
   return (
     <Layout>
       <Header className="header">
@@ -261,18 +220,10 @@ const MenuLayout: React.FC<Props> = props => {
           <Menu.Item key="2">nav 2</Menu.Item>
           <Menu.Item key="3">nav 3</Menu.Item>
           <Menu.Item key="4" className="commonTool">
-            <img src={Language} className="multiLang" />
+            <LanguageDropdown />
           </Menu.Item>
           <Menu.Item key="5" className="commonTool">
-            <Dropdown overlay={userMenu}>
-              <a
-                className="ant-dropdown-link"
-                onClick={e => e.preventDefault()}
-              >
-                {/* {currCookie.get("username")} */}
-                User Name
-              </a>
-            </Dropdown>
+            <UserDropdown />
           </Menu.Item>
         </Menu>
       </Header>
