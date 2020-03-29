@@ -55,7 +55,7 @@ const MenuLayout: React.FC<Props> = props => {
       }          
     } else if (subMenus.length > 1) {
       let menuItems:any = [];
-      subMenus.map((subMenu:any) => {
+      subMenus.forEach((subMenu:any) => {
         // judge its subMenus count
         if (subMenu.subMenus.length === 0) {
           menuItems.push(<Menu.Item key={subMenu.code}>{subMenu.name}</Menu.Item>)

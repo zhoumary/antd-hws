@@ -5,7 +5,7 @@ import { Layout } from "antd";
 import LanguageDropdown from '../components/HeaderDropdown/LanguageDropdown';
 
 import "./LoginRegister.css";
-import SAPLogo from "../assets/sap.svg";
+// import SAPLogo from "../assets/sap.svg";
 import Logo from '../assets/pandalogo.jpg';
 
 const { Header, Footer, Content } = Layout;
@@ -24,7 +24,7 @@ const LoginRegister: React.FC<Props> = props => {
         </Header>
         <Content className="content">
           <div className="loginTitle">
-            <img src={Logo} className="logo" />
+            <img src={Logo} className="logo" alt="logo" />
             <span className="systemTitle">S+ POC</span>
           </div>
           {props.children}
