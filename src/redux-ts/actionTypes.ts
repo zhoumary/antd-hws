@@ -24,3 +24,38 @@ interface UpdateUserPermissionAction {
 export type UserPermissionActionType = UpdateUserPermissionAction;
 
 
+// get user information from "/api/v1/users/${id}"
+export const FETCH_ROLES = 'FETCH_ROLES';
+export interface RolesAPI {
+    roles: {name:string; id:number; description:string;}[];  
+    error: string;  
+}
+interface UpdatRolesAction {
+    type: typeof FETCH_ROLES
+    payload: RolesAPI["roles"]
+}
+
+export const FETCH_ROLES_ERROR = "FETCH_ROLES_ERROR";
+interface UpdatRolesErrorAction {
+    type: typeof FETCH_ROLES_ERROR
+    payload: RolesAPI["error"]
+}
+
+export type RolesActionType = UpdatRolesAction|UpdatRolesErrorAction;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
