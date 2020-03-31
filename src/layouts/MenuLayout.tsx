@@ -21,10 +21,23 @@ type Props = {
 const MenuLayout: React.FC<Props> = props => {
   const [menus, setMenus] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
+  const [menuHeight, setMenuHeight] = useState(0);
+
+  const browserHeight:number = window.innerHeight;
 
   useEffect(() => {
     renderMenu();
   }); 
+
+  useEffect(() => {
+    renderWindowHeight();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [browserHeight, menuHeight]);
+
+  const renderWindowHeight = () => {
+    const menHeight:number = browserHeight - 112;
+    setMenuHeight(menHeight);
+  }
   
 
   const renderMenuItems = (menusItems: any) => { 
@@ -146,7 +159,7 @@ const MenuLayout: React.FC<Props> = props => {
             mode="inline"
             // defaultSelectedKeys={["1"]}
             // defaultOpenKeys={["sub1"]}
-            style={{ height: "100%", borderRight: 0 }}
+            style={{ height: "100%", borderRight: 0, minHeight:menuHeight }}
           >
             {menus.map(renderMenuItems)}
           </Menu>

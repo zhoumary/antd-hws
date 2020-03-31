@@ -50,18 +50,6 @@ export const Login: React.FC<Props> = props => {
     login(event);
   };
 
-  const nameChange = (e: React.FormEvent<HTMLInputElement>) => {
-    // get user name
-    const newValue = e.currentTarget.value;
-    setUserName(newValue);
-  };
-
-  const passwordChange = (e: React.FormEvent<HTMLInputElement>) => {
-    // get password
-    const newValue = e.currentTarget.value;
-    setPassword(newValue);
-  };
-
   const login = (event: {}) => {
     // call API to verify the Username and Password
     callLogin();
@@ -162,7 +150,10 @@ export const Login: React.FC<Props> = props => {
                 prefix={<UserOutlined className="site-form-item-icon" />}
                 placeholder={t('username.1')}
                 value="username"
-                onChange={nameChange}
+                onChange={e => {
+                  const name = e.target.value;
+                  setUserName(name);
+                }}
               />
             </Form.Item>
 
@@ -181,7 +172,10 @@ export const Login: React.FC<Props> = props => {
                 type="password"
                 value="password"
                 placeholder={t('password.1')}
-                onChange={passwordChange}
+                onChange={e => {
+                  const password = e.target.value;
+                  setPassword(password);
+                }}
               />
             </Form.Item>
 
