@@ -19,7 +19,7 @@ type Props = {
   setUserPermissions: typeof setUserPermissions;
 };
 
-const Login: React.FC<Props> = props => {
+export const Login: React.FC<Props> = props => {
   const { t } = useTranslation();  
   const [form] = Form.useForm();
 
@@ -190,7 +190,7 @@ const Login: React.FC<Props> = props => {
                 <Checkbox>{t('remember.1')}</Checkbox>
               </Form.Item>
 
-              <a className="login-form-forgot" href={window.location.href}>
+              <a className="login-form-forgot" href="/">
               {t('forgot.1')}
               </a>
             </Form.Item>
