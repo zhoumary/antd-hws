@@ -15,8 +15,8 @@ ReactDOM.render(
   <Suspense fallback={<div>Loading...</div>}>
     <Provider store={store}>
       <CookiesProvider>
-      <App />
-    </CookiesProvider>
+        <App />
+      </CookiesProvider>
     </Provider>
   </Suspense>
   ,

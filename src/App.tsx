@@ -1,5 +1,5 @@
 import React, { lazy } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import { Cookies, withCookies } from "react-cookie";
 
 import "./App.css";
@@ -33,6 +33,9 @@ const App = () => {
             <LoginRegister cookie={testCookie} children={<div></div>} />
           )}
         />
+        <Route path="*">
+          <Redirect to="/" />
+        </Route>
       </Switch>
     </Router>
   );
