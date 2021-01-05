@@ -13,7 +13,7 @@
         "@types/react-redux": "^7.1.7",
         "@types/universal-cookie": "^2.2.0",
         "antd": "^4.1.0",
-        "axios": "^0.19.2",
+        "axios": "^0.21.1",
         "i18next": "^19.3.3",
         "i18next-browser-languagedetector": "^4.0.2",
         "i18next-xhr-backend": "^3.2.2",
